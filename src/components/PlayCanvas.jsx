@@ -88,6 +88,25 @@ function Arrows() {
 const moveClass = (m) => `path path-${m.kind || 'cut'}`;
 const markerFor = (m) => (m.kind === 'defense' ? 'url(#ah-def)' : m.kind === 'clear' ? 'url(#ah-clear)' : 'url(#ah-cut)');
 
+// One step number per step in the Diagram, on the main thing that happens in that step:
+// the throw, else the highlighted player's move, else any move, else the zone being shown,
+// else the highlighted player.
+function badgeSpot(play, snaps, i, g, avoid) {
+  const step = play.steps[i];
+  const around = (p) => [[1.8, 2.2], [-1.8, 2.2], [1.8, -2.2], [-1.8, -2.2], [2.8, 0], [-2.8, 0], [0, 3]].map(([dx, dy]) => [p[0] + dx, p[1] + dy]);
+  if (g) {
+    return freeSpot([0.5, 0.35, 0.65, 0.25, 0.75].map((s) => [0, 1].map((k) => (1 - s) ** 2 * g.a[k] + 2 * (1 - s) * s * g.ctrl[k] + s ** 2 * g.b[k])), avoid);
+  }
+  const moves = step.moves || [];
+  const m = moves.find((mv) => step.focus?.includes(mv.id)) || moves[0];
+  if (m) return freeSpot(around(m.to), avoid);
+  const z = step.zones?.[0];
+  if (z) return freeSpot([[z.x + 1.6, z.y + 4.5], [z.x + z.w - 1.6, z.y + 4.5], [z.x + z.w / 2, z.y + z.h / 2]], avoid);
+  const who = step.focus?.[0];
+  if (who) return freeSpot(around(snaps[i + 1].pos[who]), avoid);
+  return [2, (play.view?.[0] ?? 25) + 2];
+}
+
 // Paths for one step (used as ghost guides in walkthrough and as the diagram in overview).
 function StepPaths({ play, snaps, i, number, showDefense, avoid = [] }) {
   const step = play.steps[i];
@@ -100,8 +119,6 @@ function StepPaths({ play, snaps, i, number, showDefense, avoid = [] }) {
         return <path key={m.id} d={pathD(pts)} className={moveClass(m)} markerEnd={markerFor(m)} />;
       })}
       {g && <path d={curveD(g)} className="path path-throw" markerEnd="url(#ah-throw)" />}
-      {number != null && moves.filter((m) => (showDefense || m.kind !== 'defense') && (!step.focus || step.focus.includes(m.id))).map((m) => <Badge key={`b-${m.id}`} at={freeSpot([[1.8, 2.2], [-1.8, 2.2], [1.8, -2.2], [-1.8, -2.2], [2.8, 0], [-2.8, 0]].map(([dx, dy]) => [m.to[0] + dx, m.to[1] + dy]), avoid)} n={number} />)}
-      {number != null && g && <Badge at={freeSpot([0.5, 0.35, 0.65, 0.25, 0.75].map((s) => [0, 1].map((k) => (1 - s) ** 2 * g.a[k] + 2 * (1 - s) * s * g.ctrl[k] + s ** 2 * g.b[k])), avoid)} n={number} />}
     </g>
   );
 }
@@ -153,6 +170,15 @@ export default function PlayCanvas({ play, snaps, mode, stepIndex, t }) {
   } else {
     lanes = (step.lanes || []).filter((l) => t >= (l.at ?? 0)).map((l) => ({ l, a: pos[l.from], b: endPt(l.to, pos) }));
   }
+  // Diagram step numbers: one per step, kept clear of players and of each other.
+  const badges = [];
+  if (overview && play.steps.length > 1) {
+    play.steps.forEach((st, i) => {
+      if (st.overviewSkip) return;
+      const avoid = [...Object.values(pos), ...badges.map((b) => b.at)];
+      badges.push({ n: i + 1, at: badgeSpot(play, snaps, i, st.throw ? throwGeometry(play, snaps, i) : null, avoid) });
+    });
+  }
   const disc = overview ? { pos: heldAt(play, pos, play.disc), scale: 1 } : frame.disc;
 
   return (
@@ -165,6 +191,7 @@ export default function PlayCanvas({ play, snaps, mode, stepIndex, t }) {
           : <StepPaths key={i} play={play} snaps={snaps} i={i} number={play.steps.length > 1 ? i + 1 : null} showDefense={play.overviewDefense} avoid={Object.values(pos)} />))
         : <g className="ghost"><StepPaths play={play} snaps={snaps} i={stepIndex} showDefense /></g>}
       {lanes.map(({ l, a, b }, k) => <Lane key={k} lane={l} from={a} to={b} avoid={Object.values(pos)} />)}
+      {badges.map((b) => <Badge key={`badge-${b.n}`} at={b.at} n={b.n} />)}
       {play.players.map((p) => <Player key={p.id} p={p} at={pos[p.id]} focus={focus.has(p.id)} />)}
       <Disc disc={disc} />
       <text x={FIELD_W + PAD - 0.6} y={y0 - PAD + 2.2} className="attack-label">ATTACK ↑</text>
