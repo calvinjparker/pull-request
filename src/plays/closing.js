@@ -38,14 +38,15 @@ export default {
           caption: 'C1 cuts for the front corner of the end zone. D1 is trailing a step behind.',
           focus: ['C1'],
           moves: cutToCorner,
-          lanes: [{ from: 'H1', to: 'C1', tone: 'threat', label: 'Easy throw', at: 0.55, labelSide: 'left' }],
+          lanes: [{ from: 'H1', to: 'C1', tone: 'threat', label: 'Easy throw', at: 0.75, labelSide: 'left' }],
+          duration: 3,
         },
         {
           caption: 'M is still holding the force, so the upline flick to the corner is wide open. H1 throws it and C1 catches it before D1 can catch up. Score.',
           focus: ['H1', 'C1'],
           moves: [
             { id: 'C1', to: [37.4, 11.8], kind: 'jog' },
-            { id: 'D1', via: [[28, 17.2]], to: [32.4, 15.6], kind: 'defense', start: 0.1 },
+            { id: 'D1', via: [[28, 17.2]], to: [32.4, 15.6], kind: 'defense' },
           ],
           throw: { from: 'H1', to: 'C1', kind: 'flick', at: 0.15, land: 0.85 },
         },
@@ -62,7 +63,8 @@ export default {
           caption: 'C1 cuts for the corner with D1 trailing. M sees it and closes: slides across to mark flat, square in front of H1, between H1 and the corner.',
           focus: ['M'],
           moves: [...cutToCorner, { id: 'M', via: [[31.4, 20.1]], to: [33.5, 20.8], kind: 'defense', start: 0.35, end: 0.75 }],
-          lanes: [{ from: 'H1', to: 'C1', tone: 'blocked', at: 0.7, label: '' }],
+          lanes: [{ from: 'H1', to: 'C1', tone: 'blocked', at: 0.8, label: '' }],
+          duration: 3,
         },
         {
           caption: 'H1 can’t get the upline throw past M. That buys time, and D1 catches up to C1 in the corner. The only throws left go around M, which is much harder.',

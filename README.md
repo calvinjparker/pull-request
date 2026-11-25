@@ -58,6 +58,7 @@ export default {
       caption: 'What happens in this step, in plain words.',
       focus: ['C1'],                                // optional: pulsing ring on key players (and only they get step numbers in the Overview)
       duration: 2.4,                                // optional: seconds at 1x speed
+      pause: 0.6,                                   // optional: hold this long after the step when playing through (default: no hold)
       overviewSkip: true,                           // optional: leave this step out of the Overview diagram
       zones: [{ x: 23, y: 44, w: 15, h: 16, label: 'Open side', tone: 'open' }], // tone: open | break | neutral
       moves: [
@@ -78,6 +79,8 @@ export default {
 ```
 
 The two plays in `src/plays/` now are **samples** to exercise the engine; replace them with real content.
+
+Playback is continuous: a player who is still running at the end of one step and keeps moving at the start of the next carries straight through, with no stop. Players only ease to a stop when they actually stop.
 
 ## Project layout
 

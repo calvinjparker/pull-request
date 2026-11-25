@@ -26,8 +26,16 @@ export const movePath = (from, m) => [from, ...(m.via || []), m.to];
 export function moveAt(from, m, t) {
   const start = m.start ?? 0;
   const end = m.end ?? 1;
-  const s = easeInOut(clamp((t - start) / (end - start || 1)));
-  return polyPoint(movePath(from, m), s);
+  return polyPoint(movePath(from, m), easeInOut(clamp((t - start) / (end - start || 1))));
+}
+
+const findMove = (step, id) => (step?.moves || []).find((mv) => mv.id === id);
+
+// Does this player arrive still running (previous step's move ran to its end and this one starts right away)?
+function continues(play, i, id) {
+  const m = findMove(play.steps[i], id);
+  const prev = findMove(play.steps[i - 1], id);
+  return !!(m && prev && (prev.end ?? 1) >= 1 && (m.start ?? 0) <= 0);
 }
 
 // Positions and disc holder at the start of each step (plus the final state).
@@ -44,10 +52,65 @@ export function buildSnapshots(play) {
   return snaps;
 }
 
+export const STEP_SECONDS = 2.4; // default length of one step at 1x speed
+const stepSecs = (play, k) => play.steps[k].duration ?? STEP_SECONDS;
+// Seconds from the start of the play to fraction t of step k.
+const secAt = (play, k, t) => {
+  let s = 0;
+  for (let j = 0; j < k; j++) s += stepSecs(play, j);
+  return s + t * stepSecs(play, k);
+};
+
+const pathLen = (pts) => pts.slice(1).reduce((acc, p, i) => acc + dist(pts[i], p), 0);
+
+// Smooth, non-overshooting curve through (time, distance) knots: zero speed at the ends,
+// continuous speed in between (Fritsch–Carlson monotone cubic).
+function monotoneCubic(T, D, x) {
+  const n = T.length - 1;
+  if (x <= T[0]) return D[0];
+  if (x >= T[n]) return D[n];
+  const h = [], d = [];
+  for (let k = 0; k < n; k++) { h.push(T[k + 1] - T[k]); d.push((D[k + 1] - D[k]) / (h[k] || 1)); }
+  const m = [0];
+  for (let k = 1; k < n; k++) {
+    m.push(d[k - 1] * d[k] <= 0 ? 0 : (3 * (h[k - 1] + h[k])) / ((2 * h[k] + h[k - 1]) / d[k - 1] + (h[k] + 2 * h[k - 1]) / d[k]));
+  }
+  m.push(0);
+  for (let k = 0; k < n; k++) { // keep each segment from overshooting
+    if (!d[k]) { m[k] = 0; m[k + 1] = 0; continue; }
+    const a = m[k] / d[k], b = m[k + 1] / d[k], r = a * a + b * b;
+    if (r > 9) { const t = 3 / Math.sqrt(r); m[k] = t * a * d[k]; m[k + 1] = t * b * d[k]; }
+  }
+  let k = 0;
+  while (k < n - 1 && x > T[k + 1]) k++;
+  const u = (x - T[k]) / (h[k] || 1), u2 = u * u, u3 = u2 * u;
+  return (2 * u3 - 3 * u2 + 1) * D[k] + (u3 - 2 * u2 + u) * h[k] * m[k] + (-2 * u3 + 3 * u2) * D[k + 1] + (u3 - u2) * h[k] * m[k + 1];
+}
+
+// A run that carries across steps is animated as ONE movement: the player still reaches each
+// step's "to" exactly when that step ends, but speeds up and slows down smoothly instead of
+// stopping dead at every step boundary.
 function positionAt(play, snaps, i, id, t) {
-  const m = (play.steps[i].moves || []).find((mv) => mv.id === id);
+  const m = findMove(play.steps[i], id);
   const from = snaps[i].pos[id];
-  return m ? moveAt(from, m, t) : from;
+  if (!m) return from;
+  let a = i;
+  while (continues(play, a, id)) a--;
+  let b = i;
+  while (b + 1 < play.steps.length && continues(play, b + 1, id)) b++;
+  if (a === b) return moveAt(from, m, t);
+  const pts = [snaps[a].pos[id]];
+  const T = [secAt(play, a, findMove(play.steps[a], id).start ?? 0)];
+  const D = [0];
+  for (let k = a; k <= b; k++) {
+    const mk = findMove(play.steps[k], id);
+    const seg = [pts[pts.length - 1], ...(mk.via || []), mk.to];
+    pts.push(...seg.slice(1));
+    T.push(secAt(play, k, mk.end ?? 1));
+    D.push(D[D.length - 1] + pathLen(seg));
+  }
+  const total = D[D.length - 1] || 1;
+  return polyPoint(pts, monotoneCubic(T, D, secAt(play, i, t)) / total);
 }
 
 export const DISC_OFFSET = [1.1, -1.1];

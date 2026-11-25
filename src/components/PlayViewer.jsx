@@ -1,9 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { buildSnapshots, clamp, versionsOf } from '../engine.js';
+import { buildSnapshots, clamp, versionsOf, STEP_SECONDS } from '../engine.js';
 import PlayCanvas from './PlayCanvas.jsx';
 
-const STEP_SECONDS = 2.4; // default length of one step at 1x speed
-const PAUSE_SECONDS = 0.8; // hold between steps when playing through
+// Playing through runs steps back to back with no hold; a step can add one with `pause` (seconds).
 
 export default function PlayViewer({ play: base }) {
   const versions = useMemo(() => versionsOf(base), [base]);
@@ -36,7 +35,7 @@ export default function PlayViewer({ play: base }) {
         let next = Math.max(0, cur + dt / dur);
         const boundary = i + 1;
         if (next >= stopAt.current) { setPlaying(false); return stopAt.current; }
-        if (next >= boundary && cur < boundary) { hold.current = PAUSE_SECONDS; next = boundary; }
+        if (next >= boundary && cur < boundary && play.steps[i].pause) { hold.current = play.steps[i].pause; next = boundary; }
         return next;
       });
       raf = requestAnimationFrame(tick);
