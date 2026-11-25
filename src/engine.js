@@ -114,7 +114,23 @@ function positionAt(play, snaps, i, id, t) {
 }
 
 export const DISC_OFFSET = [1.1, -1.1];
-const held = (p) => [p[0] + DISC_OFFSET[0], p[1] + DISC_OFFSET[1]];
+
+// Where a held disc is drawn: up and to the side of the holder, on the side away from the
+// nearest defender (so it never sits on top of the marker).
+export function heldAt(play, pos, holderId) {
+  const p = pos[holderId];
+  let near = null;
+  let best = Infinity;
+  for (const pl of play.players) {
+    if (pl.team !== 'D' || !pos[pl.id]) continue;
+    const d = Math.hypot(pos[pl.id][0] - p[0], pos[pl.id][1] - p[1]);
+    if (d < best) { best = d; near = pos[pl.id]; }
+  }
+  const side = near && best < 6 && near[0] > p[0] ? -1 : 1;
+  return [p[0] + side * DISC_OFFSET[0], p[1] + DISC_OFFSET[1]];
+}
+
+const allAt = (play, snaps, i, t) => Object.fromEntries(play.players.map((p) => [p.id, positionAt(play, snaps, i, p.id, t)]));
 
 const THROW_BEND = { flick: 0.12, backhand: -0.12, huck: 0.18, dump: -0.08, swing: 0.08 };
 
@@ -123,8 +139,8 @@ export function throwGeometry(play, snaps, i) {
   const th = play.steps[i].throw;
   const at = th.at ?? 0.5;
   const land = th.land ?? 1;
-  const a = held(positionAt(play, snaps, i, th.from, at));
-  const b = held(positionAt(play, snaps, i, th.to, land));
+  const a = heldAt(play, allAt(play, snaps, i, at), th.from);
+  const b = heldAt(play, allAt(play, snaps, i, land), th.to);
   const bend = th.bend ?? THROW_BEND[th.kind] ?? 0;
   const mid = lerp(a, b, 0.5);
   const len = dist(a, b);
@@ -144,10 +160,10 @@ export function frameAt(play, snaps, i, t) {
   const pos = {};
   for (const p of play.players) pos[p.id] = positionAt(play, snaps, i, p.id, t);
   const step = play.steps[i];
-  let disc = { pos: held(pos[snaps[i].holder]), scale: 1, inAir: false };
+  let disc = { pos: heldAt(play, pos, snaps[i].holder), scale: 1, inAir: false };
   if (step.throw) {
     const g = throwGeometry(play, snaps, i);
-    if (t >= g.land) disc = { pos: held(pos[step.throw.to]), scale: 1, inAir: false };
+    if (t >= g.land) disc = { pos: heldAt(play, pos, step.throw.to), scale: 1, inAir: false };
     else if (t > g.at) {
       const s = (t - g.at) / (g.land - g.at);
       const lift = g.kind === 'huck' ? 0.9 : 0.35;

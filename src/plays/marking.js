@@ -84,6 +84,7 @@ export default {
     'Stay on the break side, about an arm’s length away. No touching, no wrapping around the thrower.',
     'Move your feet, not just your arms: when they pivot, you slide.',
     'Count the stall out loud. As the marker, you’re the one counting.',
+    'Shown with a flick force; with a backhand force it’s the same, mirrored.',
   ],
   mistakes: [
     'Planting your feet and reaching, so the pivot gets around you.',

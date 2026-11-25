@@ -1,4 +1,4 @@
-import { frameAt, movePath, throwGeometry } from '../engine.js';
+import { frameAt, heldAt, movePath, throwGeometry } from '../engine.js';
 
 const FIELD_W = 40;
 const FIELD_L = 110;
@@ -144,7 +144,7 @@ export default function PlayCanvas({ play, snaps, mode, stepIndex, t }) {
   } else {
     lanes = (step.lanes || []).filter((l) => t >= (l.at ?? 0)).map((l) => ({ l, a: pos[l.from], b: endPt(l.to, pos) }));
   }
-  const disc = overview ? { pos: [pos[play.disc][0] + 1.1, pos[play.disc][1] - 1.1], scale: 1 } : frame.disc;
+  const disc = overview ? { pos: heldAt(play, pos, play.disc), scale: 1 } : frame.disc;
 
   return (
     <svg className="canvas" viewBox={vb} role="img" aria-label={`${play.title} diagram`}>
