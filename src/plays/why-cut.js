@@ -1,10 +1,19 @@
 // Section 2, lesson 1. Drafted from standard fundamentals; review before removing status: 'draft'.
+// D starts in a real defensive position: underneath C1 (between C1 and the disc) on the open side.
 const players = [
   { id: 'H1', team: 'O', label: 'H1', pos: [20, 62] },
-  { id: 'C1', team: 'O', label: 'C1', pos: [24, 46] },
+  { id: 'C1', team: 'O', label: 'C1', pos: [24, 45] },
   { id: 'M', team: 'D', label: 'M', pos: [17.2, 59.4] },
-  { id: 'D1', team: 'D', label: 'D', pos: [24.8, 41.4] },
+  { id: 'D1', team: 'D', label: 'D', pos: [24.4, 50.2] },
 ];
+
+const setup = {
+  caption: 'C1 is downfield. D is in good position: underneath C1 (between C1 and the disc) and on the open side, so the easy throw to C1 is taken away.',
+  focus: ['D1'],
+  moves: [],
+  lanes: [{ from: 'H1', to: 'C1', tone: 'blocked', at: 0.3, label: '' }],
+  duration: 3,
+};
 
 export default {
   id: 'why-cut',
@@ -16,33 +25,35 @@ export default {
   buildsOn: ['the-force'],
   category: 'Offense',
   tags: ['cutting', 'getting open', 'separation'],
-  summary: 'Standing still lets your defender take the throw away. Moving with purpose forces them to react, and that reaction is what gets you open.',
-  view: [36, 66],
+  summary: 'A defender in good position takes the throw away. Standing still lets them keep it that way; moving forces them to react, and that reaction is what gets you open.',
+  view: [32, 66],
   overviewDefense: true,
   disc: 'H1',
   players,
   variants: [
     {
       id: 'cut',
-      label: 'Cut to get open',
+      label: 'Make them react',
       tone: 'good',
-      outcome: 'Result: C1 gets a step on D and gets the disc.',
+      outcome: 'Result: D is pulled out of position, so C1 gets open and gets the disc.',
       steps: [
+        setup,
         {
-          caption: 'C1 is downfield with D right behind them. H1 has the disc with a flick force on.',
-          focus: ['C1'],
-          moves: [],
-          duration: 2.2,
-        },
-        {
-          caption: 'C1 sprints into open space toward the disc on the open side. D has to react, so they end up a step behind, and H1 throws the flick.',
+          caption: 'C1 runs hard deep. D has to turn and run with them, giving up their spot underneath.',
           focus: ['C1'],
           moves: [
-            { id: 'C1', to: [31.5, 53], kind: 'cut' },
-            { id: 'D1', to: [27.6, 46.6], kind: 'defense', start: 0.2 },
+            { id: 'C1', to: [24.4, 37.4], kind: 'cut' },
+            { id: 'D1', via: [[29.4, 44.4]], to: [29.2, 36.2], kind: 'defense', start: 0.15 },
+          ],
+        },
+        {
+          caption: 'C1 stops and comes back toward the disc. D is still moving the other way, so C1 is open, and H1 throws.',
+          focus: ['C1'],
+          moves: [
+            { id: 'C1', to: [31.5, 51], kind: 'cut' },
+            { id: 'D1', via: [[29.6, 34.4]], to: [30, 42.6], kind: 'defense' },
           ],
           throw: { from: 'H1', to: 'C1', kind: 'flick', at: 0.55 },
-          duration: 2.8,
         },
       ],
     },
@@ -52,18 +63,13 @@ export default {
       tone: 'bad',
       outcome: 'Result: C1 stays covered, and there’s nothing to throw to.',
       steps: [
+        setup,
         {
-          caption: 'C1 is downfield with D right behind them. H1 has the disc with a flick force on.',
+          caption: 'C1 waits for the disc to come to them. D doesn’t have to do anything: they stay underneath, the throw stays blocked, and the stall count keeps climbing.',
           focus: ['C1'],
           moves: [],
-          duration: 2.2,
-        },
-        {
-          caption: 'C1 waits for the disc to come to them. D simply steps in front, between C1 and H1, and takes the throw away.',
-          focus: ['D1'],
-          moves: [{ id: 'D1', via: [[29.4, 44.6], [27.4, 50.4]], to: [22.6, 51.2], kind: 'defense' }],
-          lanes: [{ from: 'H1', to: 'C1', tone: 'blocked', at: 0.7, label: '' }],
-          duration: 2.8,
+          lanes: [{ from: 'H1', to: 'C1', tone: 'blocked', label: '' }],
+          duration: 3,
         },
       ],
     },

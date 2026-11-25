@@ -65,6 +65,12 @@ export function validatePlay(play) {
       if ((m.start ?? 0) >= (m.end ?? 1)) e(`${at}: move ${m.id} start must be before end`);
     }
     for (const id of s.focus || []) if (!ids.has(id)) e(`${at}: focus on unknown player ${id}`);
+    if (s.pivot) {
+      if (s.pivot.id !== holder) e(`${at}: only the player with the disc (${holder}) can pivot`);
+      if (!['left', 'right'].includes(s.pivot.dir)) e(`${at}: pivot dir must be left or right`);
+    }
+    // The thrower can't travel: whoever has the disc at the start of a step must not move in it.
+    if ((s.moves || []).some((m) => m.id === holder)) e(`${at}: ${holder} has the disc and can't move (that's travelling). Use pivot instead.`);
     for (const l of s.lanes || []) {
       if (!ids.has(l.from)) e(`${at}: lane from unknown player ${l.from}`);
       if (!(ids.has(l.to) || (isPt(l.to) && onField(l.to)))) e(`${at}: lane to must be a player id or [x, y]`);

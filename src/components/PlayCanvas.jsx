@@ -58,6 +58,21 @@ function Player({ p, at, focus }) {
   );
 }
 
+// A pivot: the thrower keeps their pivot foot planted and turns to one side. Drawn as a curved
+// arrow sweeping around the player (never by moving the player, which would look like travelling).
+function Pivot({ at, dir }) {
+  const s = dir === 'left' ? -1 : 1;
+  const r = 2.9;
+  const start = [at[0] + s * 0.9, at[1] + r * 0.86];
+  const end = [at[0] + s * r, at[1] - 0.5];
+  return (
+    <g className="pivot">
+      <path d={`M${start[0]},${start[1]} A${r},${r} 0 0 ${s > 0 ? 0 : 1} ${end[0]},${end[1]}`} markerEnd="url(#ah-pivot)" />
+      <text x={at[0] + s * (r + 0.6)} y={at[1] + 2.4} textAnchor={s > 0 ? 'start' : 'end'}>pivot</text>
+    </g>
+  );
+}
+
 function Disc({ disc }) {
   return (
     <g transform={`translate(${disc.pos[0]},${disc.pos[1]}) scale(${disc.scale})`} className="disc">
@@ -82,7 +97,7 @@ function Arrows() {
       <path d="M0,0 L10,5 L0,10 z" className={cls} />
     </marker>
   );
-  return <defs>{mk('ah-cut', 'ah-cut')}{mk('ah-clear', 'ah-clear')}{mk('ah-throw', 'ah-throw')}{mk('ah-def', 'ah-def')}{mk('ah-lane-threat', 'ah-lane-threat')}{mk('ah-lane-open', 'ah-lane-open')}{mk('ah-lane-break', 'ah-lane-break')}</defs>;
+  return <defs>{mk('ah-cut', 'ah-cut')}{mk('ah-clear', 'ah-clear')}{mk('ah-throw', 'ah-throw')}{mk('ah-def', 'ah-def')}{mk('ah-lane-threat', 'ah-lane-threat')}{mk('ah-lane-open', 'ah-lane-open')}{mk('ah-lane-break', 'ah-lane-break')}{mk('ah-pivot', 'ah-pivot')}</defs>;
 }
 
 const moveClass = (m) => `path path-${m.kind || 'cut'}`;
@@ -190,6 +205,7 @@ export default function PlayCanvas({ play, snaps, mode, stepIndex, t }) {
         ? play.steps.map((st, i) => (st.overviewSkip ? null
           : <StepPaths key={i} play={play} snaps={snaps} i={i} number={play.steps.length > 1 ? i + 1 : null} showDefense={play.overviewDefense} avoid={Object.values(pos)} />))
         : <g className="ghost"><StepPaths play={play} snaps={snaps} i={stepIndex} showDefense /></g>}
+      {!overview && step.pivot && t > 0.05 && <Pivot at={pos[step.pivot.id]} dir={step.pivot.dir} />}
       {lanes.map(({ l, a, b }, k) => <Lane key={k} lane={l} from={a} to={b} avoid={Object.values(pos)} />)}
       {badges.map((b) => <Badge key={`badge-${b.n}`} at={b.at} n={b.n} />)}
       {play.players.map((p) => <Player key={p.id} p={p} at={pos[p.id]} focus={focus.has(p.id)} />)}
