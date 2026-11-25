@@ -17,14 +17,12 @@ function forceSteps({ name, blocked, open, markSide, openZone, breakZone, dX }) 
     },
     {
       caption: 'The side M leaves free is the OPEN side. Throws there are easy.',
-      focus: ['H1'],
       zones: [{ ...openZone, ...OPEN }],
       moves: [],
       duration: 2.6,
     },
     {
       caption: 'The side M blocks is the BREAK side. Throws there have to get around M, so they’re harder.',
-      focus: ['M'],
       zones: [{ ...breakZone, ...BREAK }],
       moves: [],
       duration: 2.6,

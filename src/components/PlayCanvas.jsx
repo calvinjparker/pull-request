@@ -89,8 +89,8 @@ const moveClass = (m) => `path path-${m.kind || 'cut'}`;
 const markerFor = (m) => (m.kind === 'defense' ? 'url(#ah-def)' : m.kind === 'clear' ? 'url(#ah-clear)' : 'url(#ah-cut)');
 
 // One step number per step in the Diagram, on the main thing that happens in that step:
-// the throw, else the highlighted player's move, else any move, else the zone being shown,
-// else the highlighted player.
+// the throw, else the highlighted player's move, else any move, else the highlighted player,
+// else the zone being shown.
 function badgeSpot(play, snaps, i, g, avoid) {
   const step = play.steps[i];
   const around = (p) => [[1.8, 2.2], [-1.8, 2.2], [1.8, -2.2], [-1.8, -2.2], [2.8, 0], [-2.8, 0], [0, 3]].map(([dx, dy]) => [p[0] + dx, p[1] + dy]);
@@ -100,10 +100,10 @@ function badgeSpot(play, snaps, i, g, avoid) {
   const moves = step.moves || [];
   const m = moves.find((mv) => step.focus?.includes(mv.id)) || moves[0];
   if (m) return freeSpot(around(m.to), avoid);
-  const z = step.zones?.[0];
-  if (z) return freeSpot([[z.x + 1.6, z.y + 4.5], [z.x + z.w - 1.6, z.y + 4.5], [z.x + z.w / 2, z.y + z.h / 2]], avoid);
   const who = step.focus?.[0];
   if (who) return freeSpot(around(snaps[i + 1].pos[who]), avoid);
+  const z = step.zones?.[0];
+  if (z) return freeSpot([[z.x + 1.6, z.y + 4.5], [z.x + z.w - 1.6, z.y + 4.5], [z.x + z.w / 2, z.y + z.h / 2]], avoid);
   return [2, (play.view?.[0] ?? 25) + 2];
 }
 
@@ -159,7 +159,7 @@ export default function PlayCanvas({ play, snaps, mode, stepIndex, t }) {
   const step = play.steps[stepIndex];
   const pos = overview ? snaps[0].pos : frame.pos;
   const focus = new Set(overview ? [] : step.focus || []);
-  const zones = overview ? play.steps.flatMap((s) => s.zones || []) : step.zones || [];
+  const zones = overview ? [...new Map(play.steps.flatMap((s) => s.zones || []).map((z) => [JSON.stringify(z), z])).values()] : step.zones || [];
   const endPt = (ref, p) => (Array.isArray(ref) ? ref : p[ref]);
   let lanes;
   if (overview) {
