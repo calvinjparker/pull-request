@@ -1,0 +1,22 @@
+{
+  "name": "ultimate-playbook",
+  "version": "1.0.0",
+  "description": "Ultimate frisbee training app: plays shown with animated, easy-to-follow diagrams",
+  "scripts": {
+    "dev": "vite",
+    "check": "node scripts/check-plays.mjs",
+    "prebuild": "npm run check",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.7.0",
+    "vite": "^5.4.21"
+  },
+  "private": true,
+  "type": "module"
+}

@@ -1,0 +1,98 @@
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { buildSnapshots, clamp } from '../engine.js';
+import PlayCanvas from './PlayCanvas.jsx';
+
+const STEP_SECONDS = 2.4; // default length of one step at 1x speed
+const PAUSE_SECONDS = 0.8; // hold between steps when playing through
+
+export default function PlayViewer({ play }) {
+  const snaps = useMemo(() => buildSnapshots(play), [play]);
+  const n = play.steps.length;
+  const [mode, setMode] = useState('walk');
+  const [time, setTime] = useState(0); // timeline position: step index + fraction
+  const [playing, setPlaying] = useState(false);
+  const [speed, setSpeed] = useState(1);
+  const stopAt = useRef(n); // where playback should stop (end, or end of one step)
+  const hold = useRef(0);
+
+  useEffect(() => { setTime(0); setPlaying(false); }, [play]);
+
+  useEffect(() => {
+    if (!playing) return;
+    let last = performance.now();
+    let raf;
+    const tick = (now) => {
+      const dt = ((now - last) / 1000) * speed;
+      last = now;
+      setTime((cur) => {
+        if (hold.current > 0) { hold.current -= dt; return cur; }
+        const i = Math.min(Math.floor(cur), n - 1);
+        const dur = play.steps[i].duration ?? STEP_SECONDS;
+        let next = cur + dt / dur;
+        const boundary = i + 1;
+        if (next >= stopAt.current) { setPlaying(false); return stopAt.current; }
+        if (next >= boundary && cur < boundary) { hold.current = PAUSE_SECONDS; next = boundary; }
+        return next;
+      });
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [playing, speed, n, play]);
+
+  const stepIndex = Math.min(Math.floor(time), n - 1);
+  const t = clamp(time - stepIndex);
+  const done = time >= n;
+
+  const playAll = () => {
+    if (playing) return setPlaying(false);
+    if (done) setTime(0);
+    stopAt.current = n; hold.current = 0; setMode('walk'); setPlaying(true);
+  };
+  const playStep = (i) => {
+    setMode('walk'); setTime(i); stopAt.current = i + 1; hold.current = 0.25; setPlaying(true);
+  };
+
+  const step = play.steps[stepIndex];
+
+  return (
+    <div className="viewer">
+      <div className="seg" role="tablist">
+        <button role="tab" aria-selected={mode === 'walk'} className={mode === 'walk' ? 'on' : ''} onClick={() => setMode('walk')}>Walkthrough</button>
+        <button role="tab" aria-selected={mode === 'overview'} className={mode === 'overview' ? 'on' : ''} onClick={() => { setMode('overview'); setPlaying(false); }}>Overview</button>
+      </div>
+
+      <div className="canvas-wrap">
+        <PlayCanvas play={play} snaps={snaps} mode={mode} stepIndex={stepIndex} t={t} />
+      </div>
+
+      {mode === 'walk' ? (
+        <>
+          <div className="caption" aria-live="polite">
+            <span className="step-no">Step {stepIndex + 1} of {n}</span>
+            <p>{step.caption}</p>
+          </div>
+          <input className="scrub" type="range" min={0} max={n} step={0.01} value={time}
+            aria-label="Timeline" onChange={(e) => { setPlaying(false); setTime(Number(e.target.value)); }} />
+          <div className="controls">
+            <button className="icon" aria-label="Previous step" onClick={() => playStep(Math.max(0, (t < 0.05 ? stepIndex - 1 : stepIndex)))}>⏮</button>
+            <button className="primary" onClick={playAll}>{playing ? '❚❚ Pause' : done ? '↺ Replay' : '▶ Play'}</button>
+            <button className="icon" aria-label="Next step" onClick={() => playStep(Math.min(n - 1, done ? n - 1 : stepIndex + (t > 0.95 ? 1 : 0)))}>⏭</button>
+            <button className="speed" onClick={() => setSpeed(speed === 1 ? 0.5 : speed === 0.5 ? 1.5 : 1)}>{speed}×</button>
+          </div>
+          <div className="dots">
+            {play.steps.map((_, i) => (
+              <button key={i} className={i === stepIndex ? 'on' : ''} aria-label={`Play step ${i + 1}`} onClick={() => playStep(i)}>{i + 1}</button>
+            ))}
+          </div>
+        </>
+      ) : (
+        <ol className="step-list">
+          {play.steps.map((s, i) => (
+            <li key={i}><button onClick={() => playStep(i)}><span className="num">{i + 1}</span>{s.caption}</button></li>
+          ))}
+        </ol>
+      )}
+    </div>
+  );
+}
