@@ -177,5 +177,9 @@ export function frameAt(play, snaps, i, t) {
 // play's players and setup but has its own steps. Returns one playable object per version.
 export function versionsOf(play) {
   if (!play.variants) return [play];
-  return play.variants.map((v) => ({ ...play, steps: v.steps, version: v }));
+  // Same order everywhere: the right way first, then neutral options, then the mistake.
+  const rank = { good: 0, neutral: 1, bad: 2 };
+  return play.variants
+    .map((v, i) => ({ ...play, steps: v.steps, version: v, _i: i }))
+    .sort((a, b) => rank[a.version.tone || 'neutral'] - rank[b.version.tone || 'neutral'] || a._i - b._i);
 }

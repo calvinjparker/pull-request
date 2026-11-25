@@ -58,6 +58,7 @@ export default {
     { id: 'M', team: 'D', label: 'M', pos: [20, 58] },
     { id: 'D1', team: 'D', label: 'D', pos: [20, 42.6] },
   ],
+  variantsPrompt: 'Which way is the force?',
   variants: [
     {
       id: 'flick',

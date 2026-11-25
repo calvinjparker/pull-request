@@ -40,6 +40,12 @@ export function validatePlay(play) {
       if (v.tone && !['good', 'bad', 'neutral'].includes(v.tone)) e(`variant ${v.id}: tone must be good, bad or neutral`);
       checkSteps(v.steps, `variant ${v.id}, `);
     }
+    const tones = (play.variants || []).map((v) => v.tone || 'neutral');
+    const compare = tones.some((t) => t !== 'neutral');
+    if (compare && (tones.includes('neutral') || !tones.includes('good') || !tones.includes('bad'))) {
+      e('versions must be either a comparison (one tone "good" and at least one "bad") or all neutral options, not a mix');
+    }
+    if (!compare && !play.variantsPrompt) e('neutral versions need a "variantsPrompt" question, e.g. "Which way is the force?"');
   } else {
     checkSteps(play.steps, '');
   }

@@ -9,6 +9,7 @@ export default function PlayViewer({ play: base }) {
   const [vi, setVi] = useState(0);
   useEffect(() => setVi(0), [base]);
   const play = versions[Math.min(vi, versions.length - 1)];
+  const isCompare = versions.some((v) => v.version && v.version.tone && v.version.tone !== 'neutral');
   const snaps = useMemo(() => buildSnapshots(play), [play]);
   const n = play.steps.length;
   const [mode, setMode] = useState('walk');
@@ -63,11 +64,18 @@ export default function PlayViewer({ play: base }) {
     <div className="viewer">
       {versions.length > 1 && (
         <div className="versions">
+          <p className="versions-prompt">{isCompare ? 'Compare: the right way vs. the mistake' : base.variantsPrompt || 'Choose a version'}</p>
           <div className="version-tabs" role="tablist" aria-label="Versions">
-            {versions.map((v, i) => (
-              <button key={v.version.id} role="tab" aria-selected={i === vi} className={`${i === vi ? 'on' : ''} tone-${v.version.tone || 'neutral'}`}
-                onClick={() => { setVi(i); setMode('walk'); }}>{v.version.label}</button>
-            ))}
+            {versions.map((v, i) => {
+              const tone = v.version.tone || 'neutral';
+              return (
+                <button key={v.version.id} role="tab" aria-selected={i === vi} className={`${i === vi ? 'on' : ''} tone-${tone}`}
+                  onClick={() => { setVi(i); setMode('walk'); }}>
+                  {tone !== 'neutral' && <span className="v-kicker">{tone === 'good' ? '✓ Do this' : '✗ Not this'}</span>}
+                  <span className="v-label">{v.version.label}</span>
+                </button>
+              );
+            })}
           </div>
           {play.version.outcome && <p className={`outcome tone-${play.version.tone || 'neutral'}`}>{play.version.outcome}</p>}
         </div>

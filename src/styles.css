@@ -186,3 +186,11 @@ h3 { font-size: 1rem; margin: 0 0 6px; }
 .mode-overview .turf-edge { fill: #1d4a30; }
 .mode-overview .stripe-a, .mode-overview .stripe-b { fill: #245c3b; }
 .mode-overview .endzone { fill: rgb(255 255 255 / 0.05); }
+
+/* version buttons: one consistent format for every play */
+.versions-prompt { margin: 0 0 6px; font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+.version-tabs button { display: grid; gap: 1px; line-height: 1.2; }
+.v-kicker { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; }
+.version-tabs button.tone-good .v-kicker { color: #15803d; }
+.version-tabs button.tone-bad .v-kicker { color: #be123c; }
+.version-tabs button:not(.on) .v-kicker { opacity: 0.8; }

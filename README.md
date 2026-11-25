@@ -29,6 +29,15 @@ Drop a new file in `src/plays/` (e.g. `src/plays/give-and-go.js`). It's picked u
 - **Advanced** plays are grouped by `category` with no forced order.
 - A section with no lessons yet shows "Coming soon".
 
+### Versions (switchable buttons)
+
+A play can have `variants` instead of `steps`. There are exactly two kinds, and they always look the same:
+
+- **Right way vs mistake:** give one version `tone: 'good'` and one or more `tone: 'bad'`. The buttons read "✓ Do this" / "✗ Not this" under the heading "Compare: the right way vs. the mistake", with the right way first.
+- **Valid options** (e.g. flick vs backhand force): no tone, plus a play-level `variantsPrompt` question such as "Which way is the force?".
+
+Each version can have an `outcome` line shown under the buttons. The checker rejects mixing the two kinds.
+
 ### Coordinates
 
 All positions are in **yards**. The field is drawn vertically, and the offense attacks **up** the screen.
