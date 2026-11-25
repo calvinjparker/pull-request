@@ -7,8 +7,8 @@ const setup = {
 };
 
 const cutToCorner = [
-  { id: 'C1', via: [[27, 24.5]], to: [36.5, 14], kind: 'cut' },
-  { id: 'D1', to: [26.8, 19.4], kind: 'defense', start: 0.15 }, // trailing a step behind
+  { id: 'C1', via: [[25.5, 17]], to: [36.5, 13.5], kind: 'cut' },
+  { id: 'D1', to: [24.6, 20.8], kind: 'defense', start: 0.15 }, // trailing a step behind
 ];
 
 export default {
@@ -23,7 +23,7 @@ export default {
   players: [
     { id: 'H1', team: 'O', label: 'H1', pos: [32, 24] },
     { id: 'C1', team: 'O', label: 'C1', pos: [21, 28] },
-    { id: 'M', team: 'D', label: 'M', pos: [29.6, 21.9] },
+    { id: 'M', team: 'D', label: 'M', pos: [29.3, 21.5] },
     { id: 'D1', team: 'D', label: 'D', pos: [17.6, 30.4] },
   ],
   variants: [
@@ -45,7 +45,7 @@ export default {
           focus: ['H1', 'C1'],
           moves: [
             { id: 'C1', to: [37.4, 11.8], kind: 'jog' },
-            { id: 'D1', to: [32.4, 16.4], kind: 'defense', start: 0.1 },
+            { id: 'D1', via: [[28, 17.2]], to: [32.4, 15.6], kind: 'defense', start: 0.1 },
           ],
           throw: { from: 'H1', to: 'C1', kind: 'flick', at: 0.15, land: 0.85 },
         },
@@ -61,7 +61,7 @@ export default {
         {
           caption: 'C1 cuts for the corner with D1 trailing. M sees it and closes: slides across to mark flat, square in front of H1, between H1 and the corner.',
           focus: ['M'],
-          moves: [...cutToCorner, { id: 'M', to: [33.3, 21.2], kind: 'defense', start: 0.35, end: 0.75 }],
+          moves: [...cutToCorner, { id: 'M', via: [[31.4, 20.1]], to: [33.5, 20.8], kind: 'defense', start: 0.35, end: 0.75 }],
           lanes: [{ from: 'H1', to: 'C1', tone: 'blocked', at: 0.7, label: '' }],
         },
         {
@@ -69,7 +69,7 @@ export default {
           focus: ['D1'],
           moves: [
             { id: 'C1', to: [37.4, 11.8], kind: 'jog' },
-            { id: 'D1', to: [34.4, 15.4], kind: 'defense' },
+            { id: 'D1', via: [[28.4, 17.4]], to: [34.4, 15.4], kind: 'defense' },
           ],
         },
       ],

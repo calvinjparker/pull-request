@@ -14,16 +14,16 @@ export default {
     { id: 'C2', team: 'O', label: 'C2', pos: [20, 46] },
     { id: 'C3', team: 'O', label: 'C3', pos: [20, 42] },
     { id: 'C4', team: 'O', label: 'C4', pos: [20, 38] },
-    { id: 'M', team: 'D', label: 'M', pos: [18.3, 60.4] },
-    { id: 'D1', team: 'D', label: 'D', pos: [22, 51.5] },
+    { id: 'M', team: 'D', label: 'M', pos: [17.8, 59.9] },
+    { id: 'D1', team: 'D', label: 'D', pos: [23.5, 48] },
   ],
   steps: [
     {
       caption: 'C1 jogs deep a few steps to sell a deep cut. Their defender backs up to stay with them.',
       focus: ['C1'],
       moves: [
-        { id: 'C1', to: [21.5, 44], kind: 'jog' },
-        { id: 'D1', to: [23, 45.5], kind: 'defense', start: 0.1 },
+        { id: 'C1', to: [24.2, 46.8], kind: 'jog' },
+        { id: 'D1', to: [26.5, 43.5], kind: 'defense', start: 0.1 },
       ],
     },
     {
@@ -32,7 +32,7 @@ export default {
       zones: [{ x: 23, y: 44, w: 15, h: 16, label: 'Open side', tone: 'open' }],
       moves: [
         { id: 'C1', to: [31, 54], kind: 'cut' },
-        { id: 'D1', to: [28.5, 50.5], kind: 'defense', start: 0.2 },
+        { id: 'D1', to: [29, 50.5], kind: 'defense', start: 0.2 },
       ],
       throw: { from: 'H1', to: 'C1', kind: 'flick', at: 0.45 },
     },

@@ -1,3 +1,5 @@
+import { buildSnapshots, frameAt, versionsOf } from './engine.js';
+
 // Checks a play object and returns a list of problems (empty list = valid).
 // Used by `npm run check` (and therefore every build) so a broken play never ships.
 
@@ -70,8 +72,41 @@ export function validatePlay(play) {
   }
 }
 
+// Players closer than this (yards, centre to centre) look like they're running through each other.
+const MIN_GAP = 3.1;
+
+// Samples every step of every version and reports players that overlap while moving.
+export function findCollisions(play) {
+  const out = [];
+  for (const v of versionsOf(play)) {
+    const snaps = buildSnapshots(v);
+    const name = v.version ? `version "${v.version.label}", ` : '';
+    v.steps.forEach((step, i) => {
+      const seen = new Set();
+      const moving = new Set((step.moves || []).map((m) => m.id));
+      for (let k = 0; k <= 50; k++) {
+        const { pos } = frameAt(v, snaps, i, k / 50);
+        const ids = Object.keys(pos);
+        for (let a = 0; a < ids.length; a++) {
+          for (let b = a + 1; b < ids.length; b++) {
+            const key = `${ids[a]}/${ids[b]}`;
+            if (seen.has(key) || !(moving.has(ids[a]) || moving.has(ids[b]))) continue; // two players standing still (e.g. a mark) is fine
+            const d = Math.hypot(pos[ids[a]][0] - pos[ids[b]][0], pos[ids[a]][1] - pos[ids[b]][1]);
+            if (d < MIN_GAP) {
+              seen.add(key);
+              out.push(`${play.id}: ${name}step ${i + 1}: ${ids[a]} and ${ids[b]} run into each other (${d.toFixed(1)} yd apart at ${Math.round((k / 50) * 100)}% of the step)`);
+            }
+          }
+        }
+      }
+    });
+  }
+  return out;
+}
+
 export function validateAll(plays) {
   const errs = plays.flatMap(validatePlay);
+  for (const p of plays) if (!validatePlay(p).length) errs.push(...findCollisions(p));
   const seen = new Set();
   for (const p of plays) {
     if (seen.has(p.id)) errs.push(`duplicate play id ${p.id}`);

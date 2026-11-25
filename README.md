@@ -21,7 +21,7 @@ npm run build    # runs check first, then builds to dist/
 ## Adding a play
 
 Drop a new file in `src/plays/` (e.g. `src/plays/give-and-go.js`). It's picked up automatically; no registration needed.
-`npm run check` (and every build, so every Vercel deploy) rejects a play with mistakes, such as a throw from someone who doesn't have the disc.
+`npm run check` (and every build, so every Vercel deploy) rejects a play with mistakes, such as a throw from someone who doesn't have the disc, or two players running through each other (any moving player passing within 3.1 yd of another). If it flags an overlap, add a `via` waypoint to route around.
 
 ### Coordinates
 
