@@ -17,13 +17,13 @@ export default {
     { id: 'H3', team: 'O', label: 'H3', pos: [14, 62] },
     { id: 'C1', team: 'O', label: 'C1', pos: [24, 42] },
     { id: 'C2', team: 'O', label: 'C2', pos: [24, 37] },
-    { id: 'M', team: 'D', label: 'M', pos: [33, 53.6] },
+    { id: 'M', team: 'D', label: 'M', pos: [32.6, 53.4] },
   ],
   steps: [
     {
       caption: 'Stall count climbing and nothing open upfield. H2, the dump, fakes upfield.',
       focus: ['H2'],
-      moves: [{ id: 'H2', to: [29.5, 54.5], kind: 'jog' }],
+      moves: [{ id: 'H2', to: [28.4, 55.4], kind: 'jog' }],
       duration: 1.6,
     },
     {
@@ -35,7 +35,10 @@ export default {
     {
       caption: 'H3 moves into space in the middle. H2 swings the disc across the field.',
       focus: ['H3', 'H2'],
-      moves: [{ id: 'H3', to: [16, 56], kind: 'cut' }],
+      moves: [
+        { id: 'H3', to: [16, 56], kind: 'cut' },
+        { id: 'M', to: [30.6, 51.6], kind: 'defense', start: 0.3 },
+      ],
       throw: { from: 'H2', to: 'H3', kind: 'swing', at: 0.4 },
     },
     {

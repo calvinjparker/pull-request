@@ -3,8 +3,8 @@
 
 const OPEN = { label: 'Open side', tone: 'open' };
 const BREAK = { label: 'Break side', tone: 'break' };
-const right = { x: 23, y: 40, w: 16, h: 24 };
-const left = { x: 1, y: 40, w: 16, h: 24 };
+const right = { x: 25, y: 40, w: 14, h: 24 };
+const left = { x: 1, y: 40, w: 14, h: 24 };
 
 // Build the four steps for one force. The marker steps to the side it's taking away; D moves to the open side (x = dX).
 function forceSteps({ name, blocked, open, markSide, openZone, breakZone, dX }) {
@@ -12,7 +12,7 @@ function forceSteps({ name, blocked, open, markSide, openZone, breakZone, dX }) 
     {
       caption: `H1 has the disc. M, the marker, stands on H1’s ${markSide} side, taking away the ${blocked}. That’s a ${name} force: H1 is pushed to throw ${open}s.`,
       focus: ['M'],
-      moves: [{ id: 'M', to: markSide === 'backhand' ? [17.4, 59.6] : [22.6, 59.6], kind: 'defense', end: 0.35 }],
+      moves: [{ id: 'M', to: markSide === 'backhand' ? [17.2, 59.4] : [22.8, 59.4], kind: 'defense', end: 0.35 }],
       duration: 3.4,
     },
     {
@@ -33,7 +33,7 @@ function forceSteps({ name, blocked, open, markSide, openZone, breakZone, dX }) 
       caption: 'The whole defense plays the same force. Downfield, D sets up on the open side of C1, because that’s where the throw will go.',
       focus: ['D1'],
       zones: [{ ...openZone, ...OPEN }],
-      moves: [{ id: 'D1', via: [[dX, 44.4]], to: [dX, 48.6], kind: 'defense' }],
+      moves: [{ id: 'D1', via: [[dX, 43.6]], to: [dX, 48.6], kind: 'defense' }],
       duration: 3,
     },
   ];
@@ -55,21 +55,21 @@ export default {
   players: [
     { id: 'H1', team: 'O', label: 'H1', pos: [20, 62] },
     { id: 'C1', team: 'O', label: 'C1', pos: [20, 47] },
-    { id: 'M', team: 'D', label: 'M', pos: [20, 58.6] },
-    { id: 'D1', team: 'D', label: 'D', pos: [20, 43.4] },
+    { id: 'M', team: 'D', label: 'M', pos: [20, 58] },
+    { id: 'D1', team: 'D', label: 'D', pos: [20, 42.6] },
   ],
   variants: [
     {
       id: 'flick',
       label: 'Flick force',
       outcome: 'Marker on the backhand side, so the open side is to H1’s flick side.',
-      steps: forceSteps({ name: 'flick (forehand)', blocked: 'backhand', open: 'flick', markSide: 'backhand', openZone: right, breakZone: left, dX: 23.6 }),
+      steps: forceSteps({ name: 'flick (forehand)', blocked: 'backhand', open: 'flick', markSide: 'backhand', openZone: right, breakZone: left, dX: 28.5 }),
     },
     {
       id: 'backhand',
       label: 'Backhand force',
       outcome: 'Marker on the flick side, so the open side is to H1’s backhand side.',
-      steps: forceSteps({ name: 'backhand', blocked: 'flick', open: 'backhand', markSide: 'flick', openZone: left, breakZone: right, dX: 16.4 }),
+      steps: forceSteps({ name: 'backhand', blocked: 'flick', open: 'backhand', markSide: 'flick', openZone: left, breakZone: right, dX: 11.5 }),
     },
   ],
   coaching: [

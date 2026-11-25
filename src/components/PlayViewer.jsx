@@ -72,12 +72,17 @@ export default function PlayViewer({ play: base }) {
           {play.version.outcome && <p className={`outcome tone-${play.version.tone || 'neutral'}`}>{play.version.outcome}</p>}
         </div>
       )}
-      <div className="seg" role="tablist">
-        <button role="tab" aria-selected={mode === 'walk'} className={mode === 'walk' ? 'on' : ''} onClick={() => setMode('walk')}>Walkthrough</button>
-        <button role="tab" aria-selected={mode === 'overview'} className={mode === 'overview' ? 'on' : ''} onClick={() => { setMode('overview'); setPlaying(false); }}>Overview</button>
+      <div className="seg" role="tablist" aria-label="View">
+        <button role="tab" aria-selected={mode === 'walk'} className={mode === 'walk' ? 'on' : ''} onClick={() => setMode('walk')}>
+          <span className="seg-title">▶ Animated</span><span className="seg-sub">step by step</span>
+        </button>
+        <button role="tab" aria-selected={mode === 'overview'} className={mode === 'overview' ? 'on' : ''} onClick={() => { setMode('overview'); setPlaying(false); }}>
+          <span className="seg-title">▦ Diagram</span><span className="seg-sub">whole play at once</span>
+        </button>
       </div>
 
-      <div className="canvas-wrap">
+      <div className={`canvas-wrap mode-${mode}`}>
+        <span className="mode-tag">{mode === 'walk' ? `Step ${stepIndex + 1} of ${n}` : 'Whole play · numbers = order'}</span>
         <PlayCanvas play={play} snaps={snaps} mode={mode} stepIndex={stepIndex} t={t} />
       </div>
 

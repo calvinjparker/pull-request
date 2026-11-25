@@ -1,7 +1,7 @@
 // Shared first step: same setup in both versions.
 const setup = {
   caption: 'H1 has the disc near the goal line, close to the sideline. M is marking a flick force, standing on the break side.',
-  focus: ['M', 'H1'],
+  focus: ['M'],
   moves: [],
   duration: 2.4,
 };
@@ -26,7 +26,7 @@ export default {
     { id: 'H1', team: 'O', label: 'H1', pos: [32, 24] },
     { id: 'C1', team: 'O', label: 'C1', pos: [21, 28] },
     { id: 'M', team: 'D', label: 'M', pos: [29.3, 21.5] },
-    { id: 'D1', team: 'D', label: 'D', pos: [17.6, 30.4] },
+    { id: 'D1', team: 'D', label: 'D', pos: [17.2, 30.8] },
   ],
   variants: [
     {
@@ -48,7 +48,7 @@ export default {
           focus: ['H1', 'C1'],
           moves: [
             { id: 'C1', to: [37.4, 11.8], kind: 'jog' },
-            { id: 'D1', via: [[28, 17.2]], to: [32.4, 15.6], kind: 'defense' },
+            { id: 'D1', via: [[27.4, 16.4]], to: [32.4, 15.4], kind: 'defense' },
           ],
           throw: { from: 'H1', to: 'C1', kind: 'flick', at: 0.15, land: 0.85 },
         },

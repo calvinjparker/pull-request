@@ -76,30 +76,50 @@ export function validatePlay(play) {
   }
 }
 
-// Players closer than this (yards, centre to centre) look like they're running through each other.
-const MIN_GAP = 3.1;
+// Minimum centre-to-centre spacing (yards) so icons never touch on screen.
+const MIN_GAP = 4.2;
+// A marker can stand a little closer to the thrower they're marking.
+const MARK_GAP = 3.4;
+// A player this close to a zone's edge looks like they're "barely in" (or barely out of) it.
+const ZONE_EDGE = 1.8;
 
-// Samples every step of every version and reports players that overlap while moving.
+// Samples every step of every version and reports icons that touch, and players left sitting
+// on the edge of a highlighted zone at the end of a step.
 export function findCollisions(play) {
   const out = [];
+  const team = Object.fromEntries(play.players.map((p) => [p.id, p.team]));
   for (const v of versionsOf(play)) {
     const snaps = buildSnapshots(v);
     const name = v.version ? `version "${v.version.label}", ` : '';
     v.steps.forEach((step, i) => {
       const seen = new Set();
-      const moving = new Set((step.moves || []).map((m) => m.id));
+      const holders = new Set([snaps[i].holder, snaps[i + 1].holder, i > 0 ? snaps[i - 1].holder : null]);
       for (let k = 0; k <= 50; k++) {
         const { pos } = frameAt(v, snaps, i, k / 50);
         const ids = Object.keys(pos);
         for (let a = 0; a < ids.length; a++) {
           for (let b = a + 1; b < ids.length; b++) {
             const key = `${ids[a]}/${ids[b]}`;
-            if (seen.has(key) || !(moving.has(ids[a]) || moving.has(ids[b]))) continue; // two players standing still (e.g. a mark) is fine
+            if (seen.has(key)) continue;
+            const isMark = (holders.has(ids[a]) || holders.has(ids[b])) && team[ids[a]] !== team[ids[b]];
+            const gap = isMark ? MARK_GAP : MIN_GAP;
             const d = Math.hypot(pos[ids[a]][0] - pos[ids[b]][0], pos[ids[a]][1] - pos[ids[b]][1]);
-            if (d < MIN_GAP) {
+            if (d < gap) {
               seen.add(key);
-              out.push(`${play.id}: ${name}step ${i + 1}: ${ids[a]} and ${ids[b]} run into each other (${d.toFixed(1)} yd apart at ${Math.round((k / 50) * 100)}% of the step)`);
+              out.push(`${play.id}: ${name}step ${i + 1}: ${ids[a]} and ${ids[b]} too close (${d.toFixed(1)} yd, need ${gap}) at ${Math.round((k / 50) * 100)}% of the step`);
             }
+          }
+        }
+      }
+      const { pos } = frameAt(v, snaps, i, 1);
+      for (const z of step.zones || []) {
+        for (const [id, p] of Object.entries(pos)) {
+          const dx = Math.min(Math.abs(p[0] - z.x), Math.abs(p[0] - (z.x + z.w)));
+          const dy = Math.min(Math.abs(p[1] - z.y), Math.abs(p[1] - (z.y + z.h)));
+          const insideY = p[1] > z.y - ZONE_EDGE && p[1] < z.y + z.h + ZONE_EDGE;
+          const insideX = p[0] > z.x - ZONE_EDGE && p[0] < z.x + z.w + ZONE_EDGE;
+          if ((insideY && dx < ZONE_EDGE) || (insideX && dy < ZONE_EDGE)) {
+            out.push(`${play.id}: ${name}step ${i + 1}: ${id} sits on the edge of the "${z.label || 'zone'}" zone; move them clearly in or out`);
           }
         }
       }

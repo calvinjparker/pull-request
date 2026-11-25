@@ -3,8 +3,8 @@ const players = [
   { id: 'H1', team: 'O', label: 'H1', pos: [20, 62] },
   { id: 'C1', team: 'O', label: 'C1', pos: [24, 47] },
   { id: 'C2', team: 'O', label: 'C2', pos: [10, 49] },
-  { id: 'M', team: 'D', label: 'M', pos: [17, 59.2] },
-  { id: 'D2', team: 'D', label: 'D', pos: [13.6, 50] },
+  { id: 'M', team: 'D', label: 'M', pos: [16.8, 58.8] },
+  { id: 'D2', team: 'D', label: 'D', pos: [14.2, 50.4] },
 ];
 
 const setup = {
@@ -38,11 +38,11 @@ export default {
       steps: [
         setup,
         {
-          caption: 'H1 pivots toward the break side to look for a backhand. M slides with them and stays between H1 and the break side.',
+          caption: 'H1 pivots out toward the break side to look for a backhand. M slides with them and stays between H1 and the break side.',
           focus: ['M'],
           moves: [
-            { id: 'H1', to: [19, 61.8], kind: 'jog' },
-            { id: 'M', to: [15.8, 59.2], kind: 'defense' },
+            { id: 'H1', to: [16, 63], kind: 'jog' },
+            { id: 'M', to: [13.6, 60], kind: 'defense' },
           ],
           lanes: [{ from: 'H1', to: 'C2', tone: 'blocked', at: 0.6, label: '' }],
         },
@@ -51,7 +51,7 @@ export default {
           focus: ['H1'],
           moves: [
             { id: 'H1', to: [20, 62], kind: 'jog', end: 0.4 },
-            { id: 'M', to: [17, 59.2], kind: 'defense', end: 0.45 },
+            { id: 'M', to: [16.8, 58.8], kind: 'defense', end: 0.45 },
             { id: 'C1', to: [30, 53], kind: 'cut' },
           ],
           throw: { from: 'H1', to: 'C1', kind: 'flick', at: 0.5 },
@@ -66,15 +66,15 @@ export default {
       steps: [
         setup,
         {
-          caption: 'H1 pivots toward the break side. M stays planted and only reaches with their arms.',
+          caption: 'H1 pivots out toward the break side. M stays planted and only reaches with their arms, so H1 gets outside the mark.',
           focus: ['M'],
-          moves: [{ id: 'H1', to: [19, 61.8], kind: 'jog' }],
+          moves: [{ id: 'H1', to: [16, 63], kind: 'jog' }],
           lanes: [{ from: 'H1', to: 'C2', tone: 'break', label: 'Break open', at: 0.6 }],
         },
         {
           caption: 'H1 throws the backhand around M to C2 on the break side, away from where the defense is set up.',
           focus: ['H1', 'C2'],
-          moves: [{ id: 'C2', to: [9, 53], kind: 'cut' }],
+          moves: [{ id: 'C2', to: [8, 55], kind: 'cut' }],
           throw: { from: 'H1', to: 'C2', kind: 'backhand', at: 0.3 },
         },
       ],

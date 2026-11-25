@@ -4,6 +4,13 @@ const FIELD_W = 40;
 const FIELD_L = 110;
 const PAD = 3;
 
+// First candidate point that is at least `gap` yards from every point in `avoid`.
+function freeSpot(cands, avoid, gap = 3) {
+  const clearance = (c) => Math.min(...avoid.map((a) => Math.hypot(a[0] - c[0], a[1] - c[1])), Infinity);
+  for (const c of cands) if (clearance(c) >= gap) return c;
+  return cands.reduce((best, c) => (clearance(c) > clearance(best) ? c : best), cands[0]); // most room available
+}
+
 const pathD = (pts) => pts.map((p, i) => `${i ? 'L' : 'M'}${p[0].toFixed(2)},${p[1].toFixed(2)}`).join(' ');
 const curveD = (g) => `M${g.a[0]},${g.a[1]} Q${g.ctrl[0]},${g.ctrl[1]} ${g.b[0]},${g.b[1]}`;
 
@@ -44,7 +51,7 @@ function Player({ p, at, focus }) {
   const off = p.team === 'O';
   return (
     <g className={`player ${off ? 'offense' : 'defense'} ${focus ? 'focus' : ''}`} transform={`translate(${x},${y})`}>
-      {focus && <circle r={2.6} className="focus-ring" />}
+      {focus && <circle r={2.15} className="focus-ring" />}
       {off ? <circle r={1.5} className="body" /> : <path d="M0,-1.8 L1.7,1.2 L-1.7,1.2 Z" className="body" />}
       <text y={off ? 0.5 : 0.75} className="label">{p.label}</text>
     </g>
@@ -82,7 +89,7 @@ const moveClass = (m) => `path path-${m.kind || 'cut'}`;
 const markerFor = (m) => (m.kind === 'defense' ? 'url(#ah-def)' : m.kind === 'clear' ? 'url(#ah-clear)' : 'url(#ah-cut)');
 
 // Paths for one step (used as ghost guides in walkthrough and as the diagram in overview).
-function StepPaths({ play, snaps, i, number, showDefense }) {
+function StepPaths({ play, snaps, i, number, showDefense, avoid = [] }) {
   const step = play.steps[i];
   const moves = (step.moves || []).filter((m) => showDefense || m.kind !== 'defense');
   const g = step.throw ? throwGeometry(play, snaps, i) : null;
@@ -93,23 +100,25 @@ function StepPaths({ play, snaps, i, number, showDefense }) {
         return <path key={m.id} d={pathD(pts)} className={moveClass(m)} markerEnd={markerFor(m)} />;
       })}
       {g && <path d={curveD(g)} className="path path-throw" markerEnd="url(#ah-throw)" />}
-      {number != null && moves.filter((m) => (showDefense || m.kind !== 'defense') && (!step.focus || step.focus.includes(m.id))).map((m) => <Badge key={`b-${m.id}`} at={m.to.map((v, k) => v + (k ? 2.2 : 1.8))} n={number} />)}
-      {number != null && g && <Badge at={[0, 1].map((k) => 0.25 * g.a[k] + 0.5 * g.ctrl[k] + 0.25 * g.b[k])} n={number} />}
+      {number != null && moves.filter((m) => (showDefense || m.kind !== 'defense') && (!step.focus || step.focus.includes(m.id))).map((m) => <Badge key={`b-${m.id}`} at={freeSpot([[1.8, 2.2], [-1.8, 2.2], [1.8, -2.2], [-1.8, -2.2], [2.8, 0], [-2.8, 0]].map(([dx, dy]) => [m.to[0] + dx, m.to[1] + dy]), avoid)} n={number} />)}
+      {number != null && g && <Badge at={freeSpot([0.5, 0.35, 0.65, 0.25, 0.75].map((s) => [0, 1].map((k) => (1 - s) ** 2 * g.a[k] + 2 * (1 - s) * s * g.ctrl[k] + s ** 2 * g.b[k])), avoid)} n={number} />}
     </g>
   );
 }
 
 // Throwing lanes: possible throws that don't happen (an easy score, a blocked lane, a break option).
 const LANE_TONES = { threat: 'Easy throw', blocked: 'Blocked', open: 'Open', break: 'Break' };
-function Lane({ from, to, lane }) {
+function Lane({ from, to, lane, avoid = [] }) {
   const dx = to[0] - from[0], dy = to[1] - from[1];
   const len = Math.hypot(dx, dy) || 1;
   const a = [from[0] + (dx / len) * 2, from[1] + (dy / len) * 2];
   const b = [to[0] - (dx / len) * 2.2, to[1] - (dy / len) * 2.2];
   const tone = lane.tone || 'threat';
   // Label (and the X on a blocked lane) sits just past the middle, clear of the thrower and mark.
-  const f = lane.labelAt ?? (tone === 'blocked' ? 0.55 : tone === 'threat' ? 0.7 : 0.5);
-  const mid = [a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f];
+  const f0 = lane.labelAt ?? (tone === 'blocked' ? 0.55 : tone === 'threat' ? 0.7 : 0.5);
+  const at = (f) => [a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f];
+  const fs = lane.labelAt != null ? [f0] : [f0, f0 + 0.1, f0 - 0.1, f0 + 0.2, f0 - 0.2, f0 + 0.3, f0 - 0.3, f0 + 0.35].filter((f) => f > 0.15 && f < 0.92);
+  const mid = freeSpot(fs.map(at), avoid, 3.6);
   const label = lane.label ?? LANE_TONES[tone];
   const flip = lane.labelSide === 'left' ? -1 : lane.labelSide === 'right' ? 1 : dx < 0 ? -1 : 1;
   return (
@@ -153,9 +162,9 @@ export default function PlayCanvas({ play, snaps, mode, stepIndex, t }) {
       <g className={overview ? 'zones-faint' : ''}>{zones.map((z, k) => <Zone key={k} z={z} />)}</g>
       {overview
         ? play.steps.map((st, i) => (st.overviewSkip ? null
-          : <StepPaths key={i} play={play} snaps={snaps} i={i} number={play.steps.length > 1 ? i + 1 : null} showDefense={play.overviewDefense} />))
+          : <StepPaths key={i} play={play} snaps={snaps} i={i} number={play.steps.length > 1 ? i + 1 : null} showDefense={play.overviewDefense} avoid={Object.values(pos)} />))
         : <g className="ghost"><StepPaths play={play} snaps={snaps} i={stepIndex} showDefense /></g>}
-      {lanes.map(({ l, a, b }, k) => <Lane key={k} lane={l} from={a} to={b} />)}
+      {lanes.map(({ l, a, b }, k) => <Lane key={k} lane={l} from={a} to={b} avoid={Object.values(pos)} />)}
       {play.players.map((p) => <Player key={p.id} p={p} at={pos[p.id]} focus={focus.has(p.id)} />)}
       <Disc disc={disc} />
       <text x={FIELD_W + PAD - 0.6} y={y0 - PAD + 2.2} className="attack-label">ATTACK ↑</text>

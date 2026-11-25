@@ -172,3 +172,17 @@ h3 { font-size: 1rem; margin: 0 0 6px; }
 .lesson-nav a small { font-weight: 600; color: var(--muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; }
 .lesson-nav .next { grid-column: 2; text-align: right; background: var(--brand); color: #fff; border-color: var(--brand); }
 .lesson-nav .next small { color: rgb(255 255 255 / 0.8); }
+
+/* view modes: Animated vs Diagram look clearly different */
+.seg button { display: grid; gap: 0; line-height: 1.15; padding: 7px 8px; }
+.seg-title { font-weight: 800; }
+.seg-sub { font-size: 0.72rem; font-weight: 600; opacity: 0.75; }
+.canvas-wrap { position: relative; }
+.mode-tag { position: absolute; top: 8px; left: 10px; z-index: 1; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; padding: 3px 8px; border-radius: 999px; pointer-events: none; }
+.mode-walk .mode-tag { background: rgb(0 0 0 / 0.45); color: #fff; }
+.mode-overview .mode-tag { background: var(--accent); color: #1c2a20; }
+/* Diagram: flat "whiteboard" field instead of striped turf, with a yellow frame */
+.mode-overview { outline: 3px solid var(--accent); outline-offset: -3px; }
+.mode-overview .turf-edge { fill: #1d4a30; }
+.mode-overview .stripe-a, .mode-overview .stripe-b { fill: #245c3b; }
+.mode-overview .endzone { fill: rgb(255 255 255 / 0.05); }
