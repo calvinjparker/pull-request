@@ -138,3 +138,14 @@ h3 { font-size: 1rem; margin: 0 0 6px; }
 .lane-threat-l { stroke: #ea580c; }
 .lane-blocked-l { stroke: #dc2626; }
 .zones-faint { opacity: 0.5; }
+
+/* versions ("what if" comparisons) */
+.versions { margin-bottom: 10px; }
+.version-tabs { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 8px; }
+.version-tabs button { border: 2px solid var(--line); background: var(--card); border-radius: 12px; padding: 10px 8px; font-weight: 700; font-size: 0.95rem; color: var(--muted); }
+.version-tabs button.on.tone-bad { border-color: var(--defense); color: #9f1239; background: #fff1f2; }
+.version-tabs button.on.tone-good { border-color: #16a34a; color: #14532d; background: #f0fdf4; }
+.version-tabs button.on.tone-neutral { border-color: var(--brand); color: var(--ink); }
+.outcome { margin: 8px 2px 0; font-size: 0.92rem; font-weight: 600; }
+.outcome.tone-bad { color: #9f1239; }
+.outcome.tone-good { color: #15803d; }

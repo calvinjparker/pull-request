@@ -107,8 +107,8 @@ function Lane({ from, to, lane }) {
   const a = [from[0] + (dx / len) * 2, from[1] + (dy / len) * 2];
   const b = [to[0] - (dx / len) * 2.2, to[1] - (dy / len) * 2.2];
   const tone = lane.tone || 'threat';
-  // A blocked lane gets its X near the thrower (where the mark takes it away); other labels sit mid-lane.
-  const f = tone === 'blocked' ? 0.3 : 0.5;
+  // Label (and the X on a blocked lane) sits just past the middle, clear of the thrower and mark.
+  const f = lane.labelAt ?? (tone === 'blocked' ? 0.55 : tone === 'threat' ? 0.7 : 0.5);
   const mid = [a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f];
   const label = lane.label ?? LANE_TONES[tone];
   const flip = lane.labelSide === 'left' ? -1 : lane.labelSide === 'right' ? 1 : dx < 0 ? -1 : 1;

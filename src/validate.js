@@ -23,11 +23,27 @@ export function validatePlay(play) {
   }
   if (!ids.size) e('no players');
   if (!ids.has(play.disc)) e(`disc holder "${play.disc}" is not a player`);
-  if (!Array.isArray(play.steps) || !play.steps.length) e('needs at least one step');
+  if (play.variants) {
+    if (play.steps) e('use either "steps" or "variants", not both');
+    if (!Array.isArray(play.variants) || play.variants.length < 2) e('"variants" needs at least two versions');
+    const vids = new Set();
+    for (const v of play.variants || []) {
+      if (!v.id || !v.label) e('each variant needs an id and a label');
+      if (vids.has(v.id)) e(`duplicate variant id ${v.id}`);
+      vids.add(v.id);
+      if (v.tone && !['good', 'bad', 'neutral'].includes(v.tone)) e(`variant ${v.id}: tone must be good, bad or neutral`);
+      checkSteps(v.steps, `variant ${v.id}, `);
+    }
+  } else {
+    checkSteps(play.steps, '');
+  }
+  return errs;
 
+  function checkSteps(steps, prefix) {
+  if (!Array.isArray(steps) || !steps.length) return e(`${prefix}needs at least one step`);
   let holder = play.disc;
-  (play.steps || []).forEach((s, i) => {
-    const at = `step ${i + 1}`;
+  steps.forEach((s, i) => {
+    const at = `${prefix}step ${i + 1}`;
     if (!s.caption) e(`${at}: missing caption`);
     for (const m of s.moves || []) {
       if (!ids.has(m.id)) e(`${at}: move for unknown player ${m.id}`);
@@ -51,7 +67,7 @@ export function validatePlay(play) {
       holder = th.to;
     }
   });
-  return errs;
+  }
 }
 
 export function validateAll(plays) {

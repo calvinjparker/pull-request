@@ -1,81 +1,88 @@
+// Shared first step: same setup in both versions.
+const setup = {
+  caption: 'H1 has the disc near the goal line, close to the sideline. M is marking a flick force, standing on the break side.',
+  focus: ['M', 'H1'],
+  moves: [],
+  duration: 2.4,
+};
+
+const cutToCorner = [
+  { id: 'C1', via: [[27, 24.5]], to: [36.5, 14], kind: 'cut' },
+  { id: 'D1', to: [26.8, 19.4], kind: 'defense', start: 0.15 }, // trailing a step behind
+];
+
 export default {
   id: 'closing',
   title: 'Closing the mark',
   category: 'Defense',
   tags: ['marking', 'force', 'end zone', 'flat mark'],
-  summary: 'When an open-side cutter beats their defender into the end zone, the marker switches to a flat mark to take away the easy upline throw.',
-  view: [6, 42],
-  overviewDefense: true, // show defenders' movement in the Overview diagram
+  summary: 'An open-side cutter has beaten their defender to the corner. Keep the force and it’s an easy score; close to a flat mark and the throw is gone.',
+  view: [6, 38],
+  overviewDefense: true,
   disc: 'H1',
   players: [
-    { id: 'H1', team: 'O', label: 'H1', pos: [26, 33] },
-    { id: 'H2', team: 'O', label: 'H2', pos: [19, 38] },
-    { id: 'C1', team: 'O', label: 'C1', pos: [30, 24] },
-    { id: 'C2', team: 'O', label: 'C2', pos: [14, 22] },
-    { id: 'M', team: 'D', label: 'M', pos: [24, 30.8] },
-    { id: 'D1', team: 'D', label: 'D', pos: [32.4, 26.4] },
-    { id: 'D2', team: 'D', label: 'D', pos: [17, 24.6] },
+    { id: 'H1', team: 'O', label: 'H1', pos: [32, 24] },
+    { id: 'C1', team: 'O', label: 'C1', pos: [21, 28] },
+    { id: 'M', team: 'D', label: 'M', pos: [29.6, 21.9] },
+    { id: 'D1', team: 'D', label: 'D', pos: [17.6, 30.4] },
   ],
-  steps: [
+  variants: [
     {
-      caption: 'Normal mark: M holds the force, taking away the break side. The open side is where the offense is supposed to throw, and downfield defenders cover it.',
-      focus: ['M'],
-      zones: [
-        { x: 28, y: 14, w: 11, h: 17, label: 'Open side', tone: 'open' },
-        { x: 1, y: 14, w: 22, h: 17, label: 'Break side', tone: 'break' },
+      id: 'force',
+      label: 'Keep the force',
+      tone: 'bad',
+      outcome: 'Result: easy upline throw, and they score.',
+      steps: [
+        setup,
+        {
+          caption: 'C1 cuts for the front corner of the end zone. D1 is trailing a step behind.',
+          focus: ['C1'],
+          moves: cutToCorner,
+          lanes: [{ from: 'H1', to: 'C1', tone: 'threat', label: 'Easy throw', at: 0.55, labelSide: 'left' }],
+        },
+        {
+          caption: 'M is still holding the force, so the upline flick to the corner is wide open. H1 throws it and C1 catches it before D1 can catch up. Score.',
+          focus: ['H1', 'C1'],
+          moves: [
+            { id: 'C1', to: [37.4, 11.8], kind: 'jog' },
+            { id: 'D1', to: [32.4, 16.4], kind: 'defense', start: 0.1 },
+          ],
+          throw: { from: 'H1', to: 'C1', kind: 'flick', at: 0.15, land: 0.85 },
+        },
       ],
-      moves: [],
-      duration: 2.8,
     },
     {
-      caption: 'C1 beats their defender into the end zone on the open side. If M keeps the normal force, H1 has an easy upline throw for the score.',
-      focus: ['C1'],
-      moves: [
-        { id: 'C1', via: [[31, 22.5]], to: [33, 11], kind: 'cut' },
-        { id: 'D1', to: [36, 17.5], kind: 'defense', start: 0.3 },
+      id: 'close',
+      label: 'Close (flat mark)',
+      tone: 'good',
+      outcome: 'Result: no easy throw, and the defender catches up.',
+      steps: [
+        setup,
+        {
+          caption: 'C1 cuts for the corner with D1 trailing. M sees it and closes: slides across to mark flat, square in front of H1, between H1 and the corner.',
+          focus: ['M'],
+          moves: [...cutToCorner, { id: 'M', to: [33.3, 21.2], kind: 'defense', start: 0.35, end: 0.75 }],
+          lanes: [{ from: 'H1', to: 'C1', tone: 'blocked', at: 0.7, label: '' }],
+        },
+        {
+          caption: 'H1 can’t get the upline throw past M. That buys time, and D1 catches up to C1 in the corner. The only throws left go around M, which is much harder.',
+          focus: ['D1'],
+          moves: [
+            { id: 'C1', to: [37.4, 11.8], kind: 'jog' },
+            { id: 'D1', to: [34.4, 15.4], kind: 'defense' },
+          ],
+        },
       ],
-      lanes: [{ from: 'H1', to: 'C1', tone: 'threat', label: 'Easy score', at: 0.55 }],
-      duration: 2.6,
-    },
-    {
-      caption: 'M closes: steps across to mark flat, square in front of H1 and directly between H1 and C1. The upline throw is gone.',
-      focus: ['M'],
-      moves: [
-        { id: 'M', to: [26.9, 30.1], kind: 'defense', end: 0.5 },
-        { id: 'D1', to: [36, 14.5], kind: 'defense' },
-      ],
-      lanes: [{ from: 'H1', to: 'C1', tone: 'blocked', at: 0.5 }],
-      duration: 2.6,
-    },
-    {
-      caption: 'The trade-off: H1 can now throw around M to the break side. That throw is harder and slower, which gives D1 time to recover and D2 a chance to make a play.',
-      focus: ['H1'],
-      moves: [
-        { id: 'D1', to: [35.6, 12.6], kind: 'defense' },
-        { id: 'D2', to: [17.5, 22.2], kind: 'defense' },
-      ],
-      lanes: [
-        { from: 'H1', to: 'C1', tone: 'blocked', labelSide: 'left' },
-        { from: 'H1', to: 'C2', tone: 'break', label: 'Break (harder)' },
-      ],
-      duration: 3,
-    },
-    {
-      caption: 'Once C1 is covered again, M goes back to the normal force.',
-      focus: ['M'],
-      moves: [{ id: 'M', to: [24, 30.8], kind: 'defense' }],
-      duration: 2,
-      overviewSkip: true,
     },
   ],
   coaching: [
-    'Close when an open-side cutter has clearly beaten their defender and the upline throw is an easy score.',
+    'Close when an open-side cutter has beaten their defender and the upline throw is an easy score.',
     'Mark flat: square to the thrower, directly between them and the open receiver.',
-    'You’re trading an easy completion for a harder break throw.',
-    'Go back to the normal force once the threat is covered.',
+    'You’re giving up a harder break throw to take away an easy score.',
+    'Go back to the normal force once the cutter is covered again.',
   ],
   mistakes: [
-    'Holding the normal force while the open-side cutter is wide open for the score.',
-    'Closing when nobody has beaten their defender, which gives up a free break.',
+    'Holding the force while the cutter is wide open in the corner.',
+    'Closing when nobody has been beaten, which gives up a free break.',
   ],
 };

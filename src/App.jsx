@@ -38,7 +38,7 @@ function PlayList() {
                 <a href={`#/play/${p.id}`} className="card">
                   <strong>{p.title}</strong>
                   {p.summary && <span>{p.summary}</span>}
-                  <small>{p.steps.length} steps{p.tags?.length ? ` · ${p.tags.join(' · ')}` : ''}</small>
+                  <small>{p.variants ? `${p.variants.length} versions to compare` : `${p.steps.length} steps`}{p.tags?.length ? ` · ${p.tags.join(' · ')}` : ''}</small>
                 </a>
               </li>
             ))}

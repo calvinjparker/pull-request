@@ -93,3 +93,10 @@ export function frameAt(play, snaps, i, t) {
   }
   return { pos, disc };
 }
+
+// A play can have switchable versions ("what if" comparisons). Each version shares the
+// play's players and setup but has its own steps. Returns one playable object per version.
+export function versionsOf(play) {
+  if (!play.variants) return [play];
+  return play.variants.map((v) => ({ ...play, steps: v.steps, version: v }));
+}

@@ -66,7 +66,7 @@ export default {
         { id: 'D1', to: [28, 50], kind: 'defense', start: 0.2 }, // start/end = when in the step (0–1) the move runs
       ],
       lanes: [{ from: 'H1', to: 'C1', tone: 'blocked', at: 0.5 }],  // possible throws that DON'T happen: tone threat | blocked | open | break
-                                                                 // optional label overrides the default text; labelSide: 'left' | 'right' moves it; "at" = when it appears in the step
+                                                                 // optional label overrides the default text; labelSide: 'left' | 'right' and labelAt (0–1 along the lane) move it; label: '' hides it; "at" = when it appears in the step
       throw: { from: 'H1', to: 'C1', kind: 'flick', at: 0.45 },  // kind: flick | backhand | huck | dump | swing | hammer | scoober
                                                                  // at/land = release and catch time within the step (land defaults to 1)
     },

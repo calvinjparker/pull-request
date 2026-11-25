@@ -1,11 +1,15 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { buildSnapshots, clamp } from '../engine.js';
+import { buildSnapshots, clamp, versionsOf } from '../engine.js';
 import PlayCanvas from './PlayCanvas.jsx';
 
 const STEP_SECONDS = 2.4; // default length of one step at 1x speed
 const PAUSE_SECONDS = 0.8; // hold between steps when playing through
 
-export default function PlayViewer({ play }) {
+export default function PlayViewer({ play: base }) {
+  const versions = useMemo(() => versionsOf(base), [base]);
+  const [vi, setVi] = useState(0);
+  useEffect(() => setVi(0), [base]);
+  const play = versions[Math.min(vi, versions.length - 1)];
   const snaps = useMemo(() => buildSnapshots(play), [play]);
   const n = play.steps.length;
   const [mode, setMode] = useState('walk');
@@ -58,6 +62,17 @@ export default function PlayViewer({ play }) {
 
   return (
     <div className="viewer">
+      {versions.length > 1 && (
+        <div className="versions">
+          <div className="version-tabs" role="tablist" aria-label="Versions">
+            {versions.map((v, i) => (
+              <button key={v.version.id} role="tab" aria-selected={i === vi} className={`${i === vi ? 'on' : ''} tone-${v.version.tone || 'neutral'}`}
+                onClick={() => { setVi(i); setMode('walk'); }}>{v.version.label}</button>
+            ))}
+          </div>
+          {play.version.outcome && <p className={`outcome tone-${play.version.tone || 'neutral'}`}>{play.version.outcome}</p>}
+        </div>
+      )}
       <div className="seg" role="tablist">
         <button role="tab" aria-selected={mode === 'walk'} className={mode === 'walk' ? 'on' : ''} onClick={() => setMode('walk')}>Walkthrough</button>
         <button role="tab" aria-selected={mode === 'overview'} className={mode === 'overview' ? 'on' : ''} onClick={() => { setMode('overview'); setPlaying(false); }}>Overview</button>
