@@ -79,6 +79,20 @@ h3 { font-size: 1rem; margin: 0 0 6px; }
 .legend .ah-cut { fill: #333; }
 .legend .path-throw { stroke: #ca8a04; }
 
+/* throwing lanes */
+.lane path { fill: none; stroke-width: 0.35; stroke-linecap: round; }
+.lane text { font-size: 1.45px; font-weight: 800; paint-order: stroke; stroke: rgb(0 0 0 / 0.55); stroke-width: 0.35px; }
+.lane-threat path { stroke: #fb923c; stroke-dasharray: 1 0.6; }
+.lane-threat text { fill: #fed7aa; }
+.ah-lane-threat { fill: #fb923c; }
+.lane-blocked path { stroke: #f87171; stroke-dasharray: 1 0.6; opacity: 0.8; }
+.lane-blocked text { fill: #fecaca; }
+.lane-x circle { fill: #dc2626; stroke: #fff; stroke-width: 0.25; }
+.lane-x path { stroke: #fff; stroke-width: 0.4; stroke-dasharray: none; opacity: 1; }
+.lane-open path, .lane-break path { stroke: #86efac; stroke-dasharray: 1 0.6; }
+.lane-open text, .lane-break text { fill: #bbf7d0; }
+.ah-lane-open, .ah-lane-break { fill: #86efac; }
+
 /* players + disc */
 .player .body { stroke: #fff; stroke-width: 0.3; }
 .offense .body { fill: var(--offense); }
@@ -120,3 +134,7 @@ h3 { font-size: 1rem; margin: 0 0 6px; }
 .legend ul { list-style: none; padding: 0; margin: 10px 0 0; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .legend li { display: flex; align-items: center; gap: 8px; font-size: 0.9rem; }
 .legend-icon { width: 44px; height: 18px; flex: none; }
+.lane-legend { fill: none; stroke-width: 0.5; stroke-dasharray: 1 0.6; }
+.lane-threat-l { stroke: #ea580c; }
+.lane-blocked-l { stroke: #dc2626; }
+.zones-faint { opacity: 0.5; }

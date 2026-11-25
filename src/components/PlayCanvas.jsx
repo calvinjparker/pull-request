@@ -75,7 +75,7 @@ function Arrows() {
       <path d="M0,0 L10,5 L0,10 z" className={cls} />
     </marker>
   );
-  return <defs>{mk('ah-cut', 'ah-cut')}{mk('ah-clear', 'ah-clear')}{mk('ah-throw', 'ah-throw')}{mk('ah-def', 'ah-def')}</defs>;
+  return <defs>{mk('ah-cut', 'ah-cut')}{mk('ah-clear', 'ah-clear')}{mk('ah-throw', 'ah-throw')}{mk('ah-def', 'ah-def')}{mk('ah-lane-threat', 'ah-lane-threat')}{mk('ah-lane-open', 'ah-lane-open')}{mk('ah-lane-break', 'ah-lane-break')}</defs>;
 }
 
 const moveClass = (m) => `path path-${m.kind || 'cut'}`;
@@ -93,8 +93,34 @@ function StepPaths({ play, snaps, i, number, showDefense }) {
         return <path key={m.id} d={pathD(pts)} className={moveClass(m)} markerEnd={markerFor(m)} />;
       })}
       {g && <path d={curveD(g)} className="path path-throw" markerEnd="url(#ah-throw)" />}
-      {number != null && moves.filter((m) => m.kind !== 'defense').map((m) => <Badge key={`b-${m.id}`} at={m.to.map((v, k) => v + (k ? 2.2 : 1.8))} n={number} />)}
+      {number != null && moves.filter((m) => (showDefense || m.kind !== 'defense') && (!step.focus || step.focus.includes(m.id))).map((m) => <Badge key={`b-${m.id}`} at={m.to.map((v, k) => v + (k ? 2.2 : 1.8))} n={number} />)}
       {number != null && g && <Badge at={[0, 1].map((k) => 0.25 * g.a[k] + 0.5 * g.ctrl[k] + 0.25 * g.b[k])} n={number} />}
+    </g>
+  );
+}
+
+// Throwing lanes: possible throws that don't happen (an easy score, a blocked lane, a break option).
+const LANE_TONES = { threat: 'Easy throw', blocked: 'Blocked', open: 'Open', break: 'Break' };
+function Lane({ from, to, lane }) {
+  const dx = to[0] - from[0], dy = to[1] - from[1];
+  const len = Math.hypot(dx, dy) || 1;
+  const a = [from[0] + (dx / len) * 2, from[1] + (dy / len) * 2];
+  const b = [to[0] - (dx / len) * 2.2, to[1] - (dy / len) * 2.2];
+  const tone = lane.tone || 'threat';
+  // A blocked lane gets its X near the thrower (where the mark takes it away); other labels sit mid-lane.
+  const f = tone === 'blocked' ? 0.3 : 0.5;
+  const mid = [a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f];
+  const label = lane.label ?? LANE_TONES[tone];
+  const flip = lane.labelSide === 'left' ? -1 : lane.labelSide === 'right' ? 1 : dx < 0 ? -1 : 1;
+  return (
+    <g className={`lane lane-${tone}`}>
+      <path d={`M${a[0]},${a[1]} L${b[0]},${b[1]}`} markerEnd={tone === 'blocked' ? undefined : `url(#ah-lane-${tone})`} />
+      {tone === 'blocked' && (
+        <g transform={`translate(${mid[0]},${mid[1]})`} className="lane-x"><circle r={1.5} /><path d="M-0.8,-0.8 L0.8,0.8 M0.8,-0.8 L-0.8,0.8" /></g>
+      )}
+      {label && (
+        <text x={mid[0] + flip * (tone === 'blocked' ? 2.1 : 1.2)} y={mid[1] + 0.5} textAnchor={flip > 0 ? 'start' : 'end'}>{label}</text>
+      )}
     </g>
   );
 }
@@ -108,16 +134,28 @@ export default function PlayCanvas({ play, snaps, mode, stepIndex, t }) {
   const pos = overview ? snaps[0].pos : frame.pos;
   const focus = new Set(overview ? [] : step.focus || []);
   const zones = overview ? play.steps.flatMap((s) => s.zones || []) : step.zones || [];
+  const endPt = (ref, p) => (Array.isArray(ref) ? ref : p[ref]);
+  let lanes;
+  if (overview) {
+    // One lane per thrower→target, keeping the latest state, drawn at the end-of-step positions.
+    const byKey = new Map();
+    play.steps.forEach((s, i) => !s.overviewSkip && (s.lanes || []).forEach((l) => byKey.set(`${l.from}>${l.to}`, { l, p: snaps[i + 1].pos })));
+    lanes = [...byKey.values()].map(({ l, p }) => ({ l, a: p[l.from], b: endPt(l.to, p) }));
+  } else {
+    lanes = (step.lanes || []).filter((l) => t >= (l.at ?? 0)).map((l) => ({ l, a: pos[l.from], b: endPt(l.to, pos) }));
+  }
   const disc = overview ? { pos: [pos[play.disc][0] + 1.1, pos[play.disc][1] - 1.1], scale: 1 } : frame.disc;
 
   return (
     <svg className="canvas" viewBox={vb} role="img" aria-label={`${play.title} diagram`}>
       <Arrows />
       <Field y0={y0} y1={y1} />
-      {zones.map((z, k) => <Zone key={k} z={z} />)}
+      <g className={overview ? 'zones-faint' : ''}>{zones.map((z, k) => <Zone key={k} z={z} />)}</g>
       {overview
-        ? play.steps.map((_, i) => <StepPaths key={i} play={play} snaps={snaps} i={i} number={play.steps.length > 1 ? i + 1 : null} />)
+        ? play.steps.map((st, i) => (st.overviewSkip ? null
+          : <StepPaths key={i} play={play} snaps={snaps} i={i} number={play.steps.length > 1 ? i + 1 : null} showDefense={play.overviewDefense} />))
         : <g className="ghost"><StepPaths play={play} snaps={snaps} i={stepIndex} showDefense /></g>}
+      {lanes.map(({ l, a, b }, k) => <Lane key={k} lane={l} from={a} to={b} />)}
       {play.players.map((p) => <Player key={p.id} p={p} at={pos[p.id]} focus={focus.has(p.id)} />)}
       <Disc disc={disc} />
       <text x={FIELD_W + PAD - 0.6} y={y0 - PAD + 2.2} className="attack-label">ATTACK ↑</text>

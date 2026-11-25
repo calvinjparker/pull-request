@@ -14,6 +14,8 @@ export default function Legend() {
         {row(<path d="M-2,0 H5" className="path path-jog" />, 'Jog / setup')}
         {row(<path d="M-2,0 H5" className="path path-clear" />, 'Clearing out')}
         {row(<path d="M-2,0 H5" className="path path-throw" />, 'Throw')}
+        {row(<path d="M-2,0 H5" className="lane-legend lane-threat-l" />, 'Easy throw (threat)')}
+        {row(<g><path d="M-2,0 H5" className="lane-legend lane-blocked-l" /><circle cx={1.5} r={1.2} fill="#dc2626" /></g>, 'Throw taken away')}
         {row(<rect x={-2} y={-1.5} width={8} height={3} className="zone-swatch" />, 'Space to attack')}
       </ul>
     </details>

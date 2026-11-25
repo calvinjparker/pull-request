@@ -37,6 +37,11 @@ export function validatePlay(play) {
       if ((m.start ?? 0) >= (m.end ?? 1)) e(`${at}: move ${m.id} start must be before end`);
     }
     for (const id of s.focus || []) if (!ids.has(id)) e(`${at}: focus on unknown player ${id}`);
+    for (const l of s.lanes || []) {
+      if (!ids.has(l.from)) e(`${at}: lane from unknown player ${l.from}`);
+      if (!(ids.has(l.to) || (isPt(l.to) && onField(l.to)))) e(`${at}: lane to must be a player id or [x, y]`);
+      if (l.tone && !['threat', 'blocked', 'open', 'break'].includes(l.tone)) e(`${at}: lane tone must be threat, blocked, open or break`);
+    }
     if (s.throw) {
       const th = s.throw;
       if (th.from !== holder) e(`${at}: throw from ${th.from}, but ${holder} has the disc`);

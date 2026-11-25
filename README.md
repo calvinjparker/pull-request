@@ -46,6 +46,7 @@ export default {
   order: 1,                     // optional sort order within the list
   view: [30, 70],               // optional: y range to show (default [25, 75])
   disc: 'H1',                   // who starts with the disc
+  overviewDefense: true,        // optional: draw defenders' moves in the Overview (good for defense plays)
 
   players: [
     { id: 'H1', team: 'O', label: 'H1', pos: [20, 62] },   // team 'O' = offense (blue circle)
@@ -55,14 +56,17 @@ export default {
   steps: [
     {
       caption: 'What happens in this step, in plain words.',
-      focus: ['C1'],                                // optional: pulsing ring on key players
+      focus: ['C1'],                                // optional: pulsing ring on key players (and only they get step numbers in the Overview)
       duration: 2.4,                                // optional: seconds at 1x speed
+      overviewSkip: true,                           // optional: leave this step out of the Overview diagram
       zones: [{ x: 23, y: 44, w: 15, h: 16, label: 'Open side', tone: 'open' }], // tone: open | break | neutral
       moves: [
         { id: 'C1', to: [31, 54], kind: 'cut' },              // kind: cut | jog | clear | defense
         { id: 'C2', to: [9, 47], via: [[23, 45]], kind: 'cut' }, // via = waypoints (plant / change direction)
         { id: 'D1', to: [28, 50], kind: 'defense', start: 0.2 }, // start/end = when in the step (0–1) the move runs
       ],
+      lanes: [{ from: 'H1', to: 'C1', tone: 'blocked', at: 0.5 }],  // possible throws that DON'T happen: tone threat | blocked | open | break
+                                                                 // optional label overrides the default text; labelSide: 'left' | 'right' moves it; "at" = when it appears in the step
       throw: { from: 'H1', to: 'C1', kind: 'flick', at: 0.45 },  // kind: flick | backhand | huck | dump | swing | hammer | scoober
                                                                  // at/land = release and catch time within the step (land defaults to 1)
     },
