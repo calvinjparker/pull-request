@@ -194,3 +194,9 @@ h3 { font-size: 1rem; margin: 0 0 6px; }
 .version-tabs button.tone-good .v-kicker { color: #15803d; }
 .version-tabs button.tone-bad .v-kicker { color: #be123c; }
 .version-tabs button:not(.on) .v-kicker { opacity: 0.8; }
+
+/* version switcher sits under the play; the field names the version being shown */
+.versions { margin: 18px 0 0; padding: 12px; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); }
+.version-tag { position: absolute; bottom: 8px; left: 10px; z-index: 1; font-size: 0.78rem; font-weight: 800; padding: 4px 10px; border-radius: 999px; pointer-events: none; background: rgb(0 0 0 / 0.5); color: #fff; }
+.version-tag.tone-good { background: #15803d; }
+.version-tag.tone-bad { background: #be123c; }

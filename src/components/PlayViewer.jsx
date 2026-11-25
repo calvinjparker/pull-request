@@ -62,24 +62,6 @@ export default function PlayViewer({ play: base }) {
 
   return (
     <div className="viewer">
-      {versions.length > 1 && (
-        <div className="versions">
-          <p className="versions-prompt">{isCompare ? 'Compare: the right way vs. the mistake' : base.variantsPrompt || 'Choose a version'}</p>
-          <div className="version-tabs" role="tablist" aria-label="Versions">
-            {versions.map((v, i) => {
-              const tone = v.version.tone || 'neutral';
-              return (
-                <button key={v.version.id} role="tab" aria-selected={i === vi} className={`${i === vi ? 'on' : ''} tone-${tone}`}
-                  onClick={() => { setVi(i); setMode('walk'); }}>
-                  {tone !== 'neutral' && <span className="v-kicker">{tone === 'good' ? '✓ Do this' : '✗ Not this'}</span>}
-                  <span className="v-label">{v.version.label}</span>
-                </button>
-              );
-            })}
-          </div>
-          {play.version.outcome && <p className={`outcome tone-${play.version.tone || 'neutral'}`}>{play.version.outcome}</p>}
-        </div>
-      )}
       <div className="seg" role="tablist" aria-label="View">
         <button role="tab" aria-selected={mode === 'walk'} className={mode === 'walk' ? 'on' : ''} onClick={() => setMode('walk')}>
           <span className="seg-title">▶ Animated</span><span className="seg-sub">step by step</span>
@@ -91,6 +73,11 @@ export default function PlayViewer({ play: base }) {
 
       <div className={`canvas-wrap mode-${mode}`}>
         <span className="mode-tag">{mode === 'walk' ? `Step ${stepIndex + 1} of ${n}` : 'Whole play · numbers = order'}</span>
+        {play.version && (
+          <span className={`version-tag tone-${play.version.tone || 'neutral'}`}>
+            {play.version.tone === 'good' ? '✓ ' : play.version.tone === 'bad' ? '✗ ' : ''}{play.version.label}
+          </span>
+        )}
         <PlayCanvas play={play} snaps={snaps} mode={mode} stepIndex={stepIndex} t={t} />
       </div>
 
@@ -120,6 +107,25 @@ export default function PlayViewer({ play: base }) {
             <li key={i}><button onClick={() => playStep(i)}><span className="num">{i + 1}</span>{s.caption}</button></li>
           ))}
         </ol>
+      )}
+
+      {versions.length > 1 && (
+        <div className="versions">
+          <p className="versions-prompt">{isCompare ? 'Compare: the right way vs. the mistake' : base.variantsPrompt || 'Choose a version'}</p>
+          <div className="version-tabs" role="tablist" aria-label="Versions">
+            {versions.map((v, i) => {
+              const tone = v.version.tone || 'neutral';
+              return (
+                <button key={v.version.id} role="tab" aria-selected={i === vi} className={`${i === vi ? 'on' : ''} tone-${tone}`}
+                  onClick={() => { setVi(i); setMode('walk'); }}>
+                  {tone !== 'neutral' && <span className="v-kicker">{tone === 'good' ? '✓ Do this' : '✗ Not this'}</span>}
+                  <span className="v-label">{v.version.label}</span>
+                </button>
+              );
+            })}
+          </div>
+          {play.version.outcome && <p className={`outcome tone-${play.version.tone || 'neutral'}`}>{play.version.outcome}</p>}
+        </div>
       )}
     </div>
   );
