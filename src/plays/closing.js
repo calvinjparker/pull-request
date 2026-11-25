@@ -14,6 +14,8 @@ const cutToCorner = [
 export default {
   id: 'closing',
   title: 'Closing the mark',
+  level: 'advanced',
+  buildsOn: ['the-force', 'marking'],
   category: 'Defense',
   tags: ['marking', 'force', 'end zone', 'flat mark'],
   summary: 'An open-side cutter has beaten their defender to the corner. Keep the force and it’s an easy score; close to a flat mark and the throw is gone.',

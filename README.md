@@ -23,6 +23,12 @@ npm run build    # runs check first, then builds to dist/
 Drop a new file in `src/plays/` (e.g. `src/plays/give-and-go.js`). It's picked up automatically; no registration needed.
 `npm run check` (and every build, so every Vercel deploy) rejects a play with mistakes, such as a throw from someone who doesn't have the disc, or two players running through each other (any moving player passing within 3.1 yd of another). If it flags an overlap, add a `via` waypoint to route around.
 
+### Levels and sections
+
+- **Beginner** is a numbered path: sections (in `src/sections.js`) with lessons in order. Each lesson page shows its position ("Section 2 · Lesson 3"), any "Builds on" links, and Previous / Next lesson buttons.
+- **Advanced** plays are grouped by `category` with no forced order.
+- A section with no lessons yet shows "Coming soon".
+
 ### Coordinates
 
 All positions are in **yards**. The field is drawn vertically, and the offense attacks **up** the screen.
@@ -40,10 +46,14 @@ y: 90–110  own end zone (bottom)
 export default {
   id: 'under-cut',              // lowercase-with-dashes, used in the URL
   title: 'The under cut',
-  category: 'Fundamentals',     // groups plays on the home screen
+  level: 'beginner',            // 'beginner' (numbered path) or 'advanced' (grouped by category)
+  section: 'vert',              // beginner only: a section id from src/sections.js
+  order: 2,                     // position within its section (or within its category for advanced)
+  buildsOn: ['the-force'],      // optional: earlier plays shown as "Builds on" links
+  status: 'draft',              // optional: shows a Draft badge until reviewed; delete the line once approved
+  category: 'Defense',          // topic; groups advanced plays on the home screen
   tags: ['cutting'],            // optional, searchable
   summary: 'One-line description.',
-  order: 1,                     // optional sort order within the list
   view: [30, 70],               // optional: y range to show (default [25, 75])
   disc: 'H1',                   // who starts with the disc
   overviewDefense: true,        // optional: draw defenders' moves in the Overview (good for defense plays)

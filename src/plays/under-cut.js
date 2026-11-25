@@ -2,6 +2,10 @@
 export default {
   id: 'under-cut',
   title: 'The under cut',
+  level: 'beginner',
+  section: 'vert',
+  order: 2,
+  status: 'draft',
   category: 'Fundamentals',
   tags: ['cutting', 'vertical stack'],
   summary: 'Sell deep, plant hard, and come back toward the disc on the open side.',

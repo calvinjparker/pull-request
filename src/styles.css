@@ -149,3 +149,26 @@ h3 { font-size: 1rem; margin: 0 0 6px; }
 .outcome { margin: 8px 2px 0; font-size: 0.92rem; font-weight: 600; }
 .outcome.tone-bad { color: #9f1239; }
 .outcome.tone-good { color: #15803d; }
+
+/* levels + beginner path */
+.level-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+.level-tabs a { text-align: center; text-decoration: none; padding: 10px; border-radius: 12px; border: 2px solid var(--line); background: var(--card); font-weight: 700; color: var(--muted); }
+.level-tabs a.on { border-color: var(--brand); background: var(--brand); color: #fff; }
+.cards { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.path-section h2 { display: flex; align-items: center; gap: 10px; font-size: 1.05rem; text-transform: none; letter-spacing: 0; color: var(--ink); margin: 26px 0 2px; }
+.sec-num { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: var(--brand); color: #fff; font-size: 0.9rem; flex: none; }
+.sec-blurb { margin: 0 0 10px 38px; color: var(--muted); font-size: 0.92rem; }
+.soon { margin: 0 0 0 38px; color: var(--muted); font-style: italic; font-size: 0.9rem; }
+.card-head { display: flex; align-items: center; gap: 8px; }
+.card .card-head strong { flex: 1; }
+.lesson-num { font-size: 0.78rem; font-weight: 800; color: var(--brand); background: #e7efe9; border-radius: 6px; padding: 2px 6px; }
+.draft-chip { font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: #92400e; background: #fef3c7; border-radius: 6px; padding: 2px 6px; }
+.eyebrow { margin: 10px 0 0; font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--brand); }
+.draft-note { margin: 0 0 8px; font-size: 0.85rem; color: #92400e; background: #fef3c7; border-radius: 8px; padding: 6px 10px; }
+.builds { margin: 0 0 12px; font-size: 0.9rem; color: var(--muted); }
+.builds a { color: var(--brand); font-weight: 600; }
+.lesson-nav { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 18px; }
+.lesson-nav a { display: grid; gap: 2px; text-decoration: none; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 10px 12px; font-weight: 700; font-size: 0.92rem; }
+.lesson-nav a small { font-weight: 600; color: var(--muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; }
+.lesson-nav .next { grid-column: 2; text-align: right; background: var(--brand); color: #fff; border-color: var(--brand); }
+.lesson-nav .next small { color: rgb(255 255 255 / 0.8); }

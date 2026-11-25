@@ -1,4 +1,5 @@
 import { buildSnapshots, frameAt, versionsOf } from './engine.js';
+import { getSection, LEVELS } from './sections.js';
 
 // Checks a play object and returns a list of problems (empty list = valid).
 // Used by `npm run check` (and therefore every build) so a broken play never ships.
@@ -14,6 +15,9 @@ export function validatePlay(play) {
   if (!play || typeof play !== 'object') return ['play is not an object'];
   for (const k of ['id', 'title', 'category']) if (typeof play[k] !== 'string' || !play[k]) e(`missing "${k}"`);
   if (play.id && !/^[a-z0-9-]+$/.test(play.id)) e('id must be lowercase letters, numbers and dashes');
+  if (!LEVELS.includes(play.level)) e(`level must be one of ${LEVELS.join(', ')}`);
+  if (play.level === 'beginner' && !getSection(play.section)) e(`beginner plays need a section that exists in sections.js (got "${play.section}")`);
+  if (play.status && play.status !== 'draft') e('status can only be "draft" (or left out once reviewed)');
   if (play.view && !(isPt(play.view) && play.view[0] < play.view[1])) e('view must be [yStart, yEnd]');
 
   const ids = new Set();
@@ -107,6 +111,8 @@ export function findCollisions(play) {
 export function validateAll(plays) {
   const errs = plays.flatMap(validatePlay);
   for (const p of plays) if (!validatePlay(p).length) errs.push(...findCollisions(p));
+  const ids = new Set(plays.map((p) => p.id));
+  for (const p of plays) for (const b of p.buildsOn || []) if (!ids.has(b)) errs.push(`${p.id}: buildsOn "${b}" is not a play`);
   const seen = new Set();
   for (const p of plays) {
     if (seen.has(p.id)) errs.push(`duplicate play id ${p.id}`);

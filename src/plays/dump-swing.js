@@ -2,6 +2,10 @@
 export default {
   id: 'dump-swing',
   title: 'Dump and swing',
+  level: 'beginner',
+  section: 'flow',
+  order: 2,
+  status: 'draft',
   category: 'Fundamentals',
   tags: ['handling', 'reset'],
   summary: 'Trapped on the sideline with the stall climbing: reset to the dump, then swing to the open field.',
