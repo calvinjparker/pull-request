@@ -83,10 +83,10 @@ export default function App() {
   const route = useRoute();
   const m = route.match(/^play\/([a-z0-9-]+)/);
   const play = m && getPlay(m[1]);
-  useEffect(() => { document.title = play ? `${play.title} · Ultimate Playbook` : 'Ultimate Playbook'; }, [play]);
+  useEffect(() => { document.title = play ? `${play.title} · Force of Habit` : 'Force of Habit'; }, [play]);
   return (
     <div className="app">
-      <header className="top"><a href="#/" className="brand"><img src="/icon.svg" alt="" />Ultimate Playbook</a></header>
+      <header className="top"><a href="#/" className="brand"><img src="/icon.svg" alt="" />Force of Habit</a></header>
       {m && !play ? <main className="list"><p className="empty">That play doesn’t exist. <a href="#/">See all plays</a></p></main>
         : play ? <PlayPage play={play} /> : <PlayList />}
     </div>
