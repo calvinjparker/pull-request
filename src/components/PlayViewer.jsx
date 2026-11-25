@@ -22,13 +22,14 @@ export default function PlayViewer({ play }) {
     let last = performance.now();
     let raf;
     const tick = (now) => {
-      const dt = ((now - last) / 1000) * speed;
+      // rAF timestamps can be slightly earlier than performance.now(), so never go backwards.
+      const dt = Math.max(0, (now - last) / 1000) * speed;
       last = now;
       setTime((cur) => {
         if (hold.current > 0) { hold.current -= dt; return cur; }
         const i = Math.min(Math.floor(cur), n - 1);
         const dur = play.steps[i].duration ?? STEP_SECONDS;
-        let next = cur + dt / dur;
+        let next = Math.max(0, cur + dt / dur);
         const boundary = i + 1;
         if (next >= stopAt.current) { setPlaying(false); return stopAt.current; }
         if (next >= boundary && cur < boundary) { hold.current = PAUSE_SECONDS; next = boundary; }
@@ -40,7 +41,7 @@ export default function PlayViewer({ play }) {
     return () => cancelAnimationFrame(raf);
   }, [playing, speed, n, play]);
 
-  const stepIndex = Math.min(Math.floor(time), n - 1);
+  const stepIndex = clamp(Math.floor(time) || 0, 0, n - 1);
   const t = clamp(time - stepIndex);
   const done = time >= n;
 
