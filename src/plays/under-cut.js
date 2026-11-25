@@ -3,7 +3,7 @@ export default {
   id: 'under-cut',
   title: 'The under cut',
   level: 'beginner',
-  section: 'vert',
+  section: 'cutting',
   order: 2,
   status: 'draft',
   category: 'Fundamentals',

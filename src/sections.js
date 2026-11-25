@@ -3,9 +3,9 @@
 // Advanced plays have no section; they're grouped by `category` instead.
 export const sections = [
   { id: 'field', number: 1, title: 'The basics of the field', blurb: 'How the defense sets up around the thrower, and why it matters to everyone.' },
-  { id: 'vert', number: 2, title: 'Vertical stack', blurb: 'The standard offense: where to stand, how to cut, and how to get out of the way.' },
-  { id: 'flow', number: 3, title: 'Keeping the disc moving', blurb: 'Continuations and resets, so the offense never gets stuck.' },
-  { id: 'break', number: 4, title: 'Breaking the mark', blurb: 'Getting the disc to the side the defense is taking away.' },
+  { id: 'cutting', number: 2, title: 'Cutting', blurb: 'Why we cut, and the basic moves for getting open.' },
+  { id: 'vert', number: 3, title: 'Vertical stack', blurb: 'The standard offense: the setup, then how the disc moves through it, including continuations and breaks.' },
+  { id: 'resets', number: 4, title: 'Resets', blurb: 'What to do when nothing is open upfield.' },
   { id: 'defense', number: 5, title: 'Defense basics', blurb: 'Guarding a cutter within the force.' },
 ];
 
