@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { plays, getPlay, lessonsIn, advancedPlays, lessonPosition, neighbours } from './plays/index.js';
 import { sections } from './sections.js';
+import { calls, WHEN, rulesSource } from './rules.js';
 import PlayViewer from './components/PlayViewer.jsx';
 import Legend from './components/Legend.jsx';
 
@@ -68,12 +69,68 @@ function PlayList({ level }) {
 
   return (
     <main className="list">
-      <div className="level-tabs" role="tablist" aria-label="Level">
-        <a role="tab" aria-selected={level === 'beginner'} className={level === 'beginner' ? 'on' : ''} href="#/">Beginner</a>
-        <a role="tab" aria-selected={level === 'advanced'} className={level === 'advanced' ? 'on' : ''} href="#/advanced">Advanced</a>
-      </div>
+      <TopTabs current={level} />
       <input className="search" type="search" placeholder="Search all plays" value={q} onChange={(e) => setQ(e.target.value)} />
       {body}
+    </main>
+  );
+}
+
+function TopTabs({ current }) {
+  const tab = (id, href, label) => (
+    <a role="tab" aria-selected={current === id} className={current === id ? 'on' : ''} href={href}>{label}</a>
+  );
+  return (
+    <div className="level-tabs" role="tablist" aria-label="Section">
+      {tab('beginner', '#/', 'Beginner')}
+      {tab('advanced', '#/advanced', 'Advanced')}
+      {tab('rules', '#/rules', 'Rules')}
+    </div>
+  );
+}
+
+// League rules: one card per call. Toggle between what happens if the call is accepted or contested.
+function RulesPage() {
+  const [mode, setMode] = useState('uncontested');
+  const [q, setQ] = useState('');
+  const needle = q.trim().toLowerCase();
+  const shown = calls.filter((c) => !needle || [c.name, c.caller, c.note].join(' ').toLowerCase().includes(needle));
+  return (
+    <main className="list rules">
+      <TopTabs current="rules" />
+      <p className="rules-intro">What happens after each call, by when it happened. From the league’s <em>{rulesSource}</em>.</p>
+      <div className="seg rules-seg" role="tablist" aria-label="Call outcome">
+        <button role="tab" aria-selected={mode === 'uncontested'} className={mode === 'uncontested' ? 'on' : ''} onClick={() => setMode('uncontested')}>
+          <span className="seg-title">Accepted</span><span className="seg-sub">call not contested</span>
+        </button>
+        <button role="tab" aria-selected={mode === 'contested'} className={mode === 'contested' ? 'on' : ''} onClick={() => setMode('contested')}>
+          <span className="seg-title">Contested</span><span className="seg-sub">other team disagrees</span>
+        </button>
+      </div>
+      <input className="search" type="search" placeholder="Search calls (e.g. pick, travel)" value={q} onChange={(e) => setQ(e.target.value)} />
+      {shown.length === 0 && <p className="empty">No calls match “{q}”.</p>}
+      <ul className="cards">
+        {shown.map((c) => (
+          <li key={c.id} id={`rule-${c.id}`} className="rule-card">
+            <div className="rule-head">
+              <strong>{c.name}</strong>
+              <span className="caller">Called by: {c.caller}</span>
+            </div>
+            {c.note && <p className="rule-note">{c.note}</p>}
+            <dl>
+              {WHEN.map((w) => {
+                const v = c[mode][w.key];
+                return (
+                  <div key={w.key} className={v ? '' : 'na'}>
+                    <dt>{w.label}</dt>
+                    <dd>{v || 'Doesn’t apply'}</dd>
+                  </div>
+                );
+              })}
+            </dl>
+          </li>
+        ))}
+      </ul>
     </main>
   );
 }
@@ -129,12 +186,13 @@ export default function App() {
   const route = useRoute();
   const m = route.match(/^play\/([a-z0-9-]+)/);
   const play = m && getPlay(m[1]);
-  useEffect(() => { document.title = play ? `${play.title} · Force of Habit` : 'Force of Habit'; }, [play]);
+  useEffect(() => { document.title = play ? `${play.title} · Force of Habit` : route.startsWith('rules') ? 'Rules · Force of Habit' : 'Force of Habit'; }, [play, route]);
   return (
     <div className="app">
       <header className="top"><a href="#/" className="brand"><img src="/icon.svg" alt="" />Force of Habit</a></header>
       {m && !play ? <main className="list"><p className="empty">That play doesn’t exist. <a href="#/">See all plays</a></p></main>
-        : play ? <PlayPage play={play} /> : <PlayList level={route.startsWith('advanced') ? 'advanced' : 'beginner'} />}
+        : play ? <PlayPage play={play} /> : route.startsWith('rules') ? <RulesPage />
+        : <PlayList level={route.startsWith('advanced') ? 'advanced' : 'beginner'} />}
     </div>
   );
 }

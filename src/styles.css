@@ -204,3 +204,21 @@ h3 { font-size: 1rem; margin: 0 0 6px; }
 .pivot path { fill: none; stroke: var(--accent); stroke-width: 0.4; stroke-linecap: round; }
 .pivot text { fill: #fde68a; font-size: 1.3px; font-weight: 800; paint-order: stroke; stroke: rgb(0 0 0 / 0.55); stroke-width: 0.3px; }
 .ah-pivot { fill: var(--accent); }
+
+/* top tabs now hold three sections */
+.level-tabs { grid-template-columns: repeat(3, 1fr); }
+
+/* rules */
+.rules-intro { margin: 0 0 10px; color: var(--muted); font-size: 0.92rem; }
+.rules-seg { margin-bottom: 10px; }
+.rules .search { margin-bottom: 12px; }
+.rule-card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 14px; }
+.rule-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 10px; }
+.rule-head strong { font-size: 1.02rem; }
+.caller { font-size: 0.78rem; font-weight: 700; color: var(--brand); background: #e7efe9; border-radius: 6px; padding: 2px 7px; }
+.rule-note { margin: 6px 0 0; font-size: 0.85rem; color: #92400e; }
+.rule-card dl { margin: 8px 0 0; display: grid; gap: 6px; }
+.rule-card dl > div { display: grid; grid-template-columns: 112px 1fr; gap: 8px; padding-top: 6px; border-top: 1px solid var(--line); }
+.rule-card dt { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); padding-top: 2px; }
+.rule-card dd { margin: 0; font-size: 0.93rem; }
+.rule-card .na dd { color: #9aa79f; font-style: italic; }

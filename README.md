@@ -102,6 +102,10 @@ The two plays in `src/plays/` now are **samples** to exercise the engine; replac
 
 Playback is continuous: a player who is still running at the end of one step and keeps moving at the start of the next carries straight through, with no stop. Players only ease to a stop when they actually stop.
 
+## League rules
+
+The **Rules** tab (`#/rules`) shows one card per call: who calls it, and what happens before the throw / on a completed throw / on an incomplete throw, with a toggle for accepted vs contested. The data lives in `src/rules.js`, transcribed from the league's "Updated Rules Table"; edit it there when the league updates the rules (`null` = doesn't apply).
+
 ## Project layout
 
 ```
@@ -110,5 +114,7 @@ src/validate.js             play checker (used by npm run check)
 src/components/PlayCanvas   SVG field, players, disc, paths, zones
 src/components/PlayViewer   walkthrough / overview, playback controls, timeline
 src/plays/                  one file per play
+src/rules.js                league rules table (Rules tab)
+src/sections.js             beginner path sections
 public/                     icons, manifest, service worker
 ```
